@@ -1,0 +1,96 @@
+{
+  "neurons": [
+    {
+      "id": "n1",
+      "spikes": 2
+    },
+    {
+      "id": "n2",
+      "spikes": 1
+    },
+    {
+      "id": "n3",
+      "spikes": 3
+    },
+    {
+      "id": "out",
+      "spikes": 0
+    }
+  ],
+  "rules": [
+    {
+      "id": "r1",
+      "neuron": "n1",
+      "definition": "a^2/a->a",
+      "delay": 0
+    },
+    {
+      "id": "r2",
+      "neuron": "n1",
+      "definition": "a->λ",
+      "delay": 0
+    },
+    {
+      "id": "r3",
+      "neuron": "n2",
+      "definition": "a->a",
+      "delay": 0
+    },
+    {
+      "id": "r4",
+      "neuron": "n2",
+      "definition": "a->a",
+      "delay": 1
+    },
+    {
+      "id": "r5",
+      "neuron": "n3",
+      "definition": "a^3->a",
+      "delay": 0
+    },
+    {
+      "id": "r6",
+      "neuron": "n3",
+      "definition": "a->a",
+      "delay": 1
+    },
+    {
+      "id": "r7",
+      "neuron": "n3",
+      "definition": "a^2->λ",
+      "delay": 0
+    }
+  ],
+  "synapses": [
+    {
+      "id": "n1_n2",
+      "source": "n1",
+      "target": "n2",
+      "weight": 1
+    },
+    {
+      "id": "n1_n3",
+      "source": "n1",
+      "target": "n3",
+      "weight": 1
+    },
+    {
+      "id": "n2_n1",
+      "source": "n2",
+      "target": "n1",
+      "weight": 1
+    },
+    {
+      "id": "n2_n3",
+      "source": "n2",
+      "target": "n3",
+      "weight": 1
+    },
+    {
+      "id": "n3_out",
+      "source": "n3",
+      "target": "out",
+      "weight": 1
+    }
+  ]
+}

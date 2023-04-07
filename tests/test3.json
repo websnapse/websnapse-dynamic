@@ -1,0 +1,79 @@
+{
+  "neurons": {
+    "n1": {
+      "type": "center",
+      "content": "a^{2}",
+      "rules": {
+        "r1": {
+          "definition": "a^2/a->a;0"
+        },
+        "r2": {
+          "definition": "a->0"
+        }
+      }
+    },
+    "n2": {
+      "type": "center",
+      "content": "a",
+      "rules": {
+        "r3": {
+          "definition": "a->a;0"
+        },
+        "r4": {
+          "definition": "a->a;1"
+        }
+      }
+    },
+    "n3": {
+      "type": "center",
+      "content": "a^{3}",
+      "rules": {
+        "r5": {
+          "definition": "a^3->a;0"
+        },
+        "r6": {
+          "definition": "a->a;1"
+        },
+        "r7": {
+          "definition": "a^2->0"
+        }
+      }
+    },
+    "out": {
+      "type": "output",
+      "content": "",
+      "rules": {
+        "r8": {
+          "definition": "a->a;0"
+        }
+      }
+    }
+  },
+  "synapses": {
+    "n1_n2": {
+      "source": "n1",
+      "target": "n2",
+      "weight": 1
+    },
+    "n1_n3": {
+      "source": "n1",
+      "target": "n3",
+      "weight": 1
+    },
+    "n2_n1": {
+      "source": "n2",
+      "target": "n1",
+      "weight": 1
+    },
+    "n2_n3": {
+      "source": "n2",
+      "target": "n3",
+      "weight": 1
+    },
+    "n3_out": {
+      "source": "n3",
+      "target": "out",
+      "weight": 1
+    }
+  }
+}
