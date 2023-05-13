@@ -1,0 +1,102 @@
+{
+  "nodes": [
+    {
+      "id": "n1",
+      "content": 2,
+      "rules": ["a \\to a;0", "a^2 \\to 0"],
+      "nodeType": "regular",
+      "x": 1038.7469214202958,
+      "y": 472.1743591262306
+    },
+    {
+      "id": "n2",
+      "content": 2,
+      "rules": [
+        "{(a^2)^3}^+ \\to a;0",
+        "a^2 \\to 0",
+        "a^3 \\to 0",
+        "a^3 \\to 0"
+      ],
+      "nodeType": "regular",
+      "x": 1362.6274664634075,
+      "y": 724.2530761001316
+    },
+    {
+      "id": "n3",
+      "content": 4,
+      "rules": [
+        "{(a^2)^3}^+ \\to a;0",
+        "a^2 \\to 0",
+        "a^3 \\to 0",
+        "a^3 \\to 0"
+      ],
+      "nodeType": "regular",
+      "x": 971.033079369643,
+      "y": 718.9083891599252
+    },
+    {
+      "id": "n4",
+      "content": 3,
+      "rules": [
+        "{(a^2)^3}^+ \\to a;0",
+        "a^2 \\to 0",
+        "a^3 \\to 0",
+        "a^3 \\to 0"
+      ],
+      "nodeType": "regular",
+      "x": 1122.5219223900683,
+      "y": 230.40465172672268
+    },
+    {
+      "id": "n5",
+      "content": 0,
+      "rules": [
+        "{(a^2)^3}^+ \\to a;0",
+        "a^2 \\to 0",
+        "a^3 \\to 0",
+        "a^3 \\to 0"
+      ],
+      "nodeType": "regular",
+      "x": 750.5273697447066,
+      "y": 389.5249311134429
+    },
+    {
+      "id": "n6",
+      "content": 2,
+      "rules": [
+        "{(a^2)^3}^+ \\to a;0",
+        "a^2 \\to 0",
+        "a^3 \\to 0",
+        "a^3 \\to 0"
+      ],
+      "nodeType": "regular",
+      "x": 492.1639616119164,
+      "y": 699.9279519871706
+    },
+    {
+      "id": "n7",
+      "content": 4,
+      "rules": [
+        "{(a^2)^3}^+ \\to a;0",
+        "a^2 \\to 0",
+        "a^3 \\to 0",
+        "a^3 \\to 0"
+      ],
+      "nodeType": "regular",
+      "x": 838.8893771125738,
+      "y": 131.76528266860464
+    }
+  ],
+  "edges": [
+    { "source": "n1", "target": "n2", "label": "1" },
+    { "source": "n2", "target": "n3", "label": "1" },
+    { "source": "n3", "target": "n4", "label": "1" },
+    { "source": "n4", "target": "n5", "label": "1" },
+    { "source": "n5", "target": "n6", "label": "1" },
+    { "source": "n5", "target": "n4", "label": "1" },
+    { "source": "n1", "target": "n7", "label": "1" },
+    { "source": "n7", "target": "n5", "label": 1 },
+    { "source": "n5", "target": "n6", "label": 1 },
+    { "source": "n6", "target": "n5", "label": 1 }
+  ]
+}

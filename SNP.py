@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Optional, Dict
+from typing import Dict
 import numpy as np
 import regex as re
 import json
@@ -44,10 +44,10 @@ class MatrixSNPSystem:
 
         self.config_vct = self.init_config_mx()
         self.adj_mx = self.init_adj_mx()
-        self.delay_status_vct = self.init_delay_status_vct()
         self.init_trans_mx()
+        self.delay_status_vct = self.init_delay_status_vct()
         self.neuron_status_vct = self.init_neuron_status_vct()
-        self.delayed_spikeable = self.init_delayed_spikeable()
+        self.delayed_indicator_vct = self.init_delayed_indicator_vct()
 
         self.print_system()
         self.simulate(1)
@@ -68,24 +68,30 @@ class MatrixSNPSystem:
         print(self.rule_delay_vct)
 
     def simulate(self, iteration: int):
-        if iteration > 4:
-            return
         print(f"= {iteration} ===")
         self.set_spikeable_mx()
-        print('SM:', end=' ')
-        print(self.spikeable_mx)
+        # print('SM:', end=' ')
+        # print(self.spikeable_mx)
 
         self.choose_spiking_vct()
-        print('SV:', end=' ')
-        print(self.chosen_spiking_vct)
+        # print('SV:', end=' ')
+        # print(self.decision_vct)
 
         self.update_delay_status_vct()
-        print('DS:', end=' ')
-        print(self.delay_status_vct)
+        # print('DS:', end=' ')
+        # print(self.delay_status_vct)
 
         self.compute_indicator_vct()
-        print('IV:', end=' ')
-        print(self.indicator_vct)
+        # print('IV:', end=' ')
+        # print(self.indicator_vct)
+
+        self.update_delayed_indicator_vct()
+        # print('DIV:', end=' ')
+        # print(self.delayed_indicator_vct)
+
+        self.update_neuron_status_vct()
+        # print('NS:', end=' ')
+        # print(self.neuron_status_vct)
 
         net_gain = np.dot(self.indicator_vct,
                           self.trans_mx).astype(int)
@@ -97,20 +103,22 @@ class MatrixSNPSystem:
             self.neuron_status_vct, net_gain).astype(int)
         print(self.config_vct, self.config_vct[-1])
 
-        self.update_neuron_status_vct()
-        print('NS:', end=' ')
-        print(self.neuron_status_vct)
-
-        # while self.config_vct.sum() > 0:
-        self.simulate(iteration+1)
+        while self.config_vct.sum() > 0:
+            self.simulate(iteration+1)
         # print(depth)
 
     def choose_spiking_vct(self):
         possible_spiking_vct = len(self.spikeable_mx)
-        # chosen_spiking_vct_idx = random.randint(1, possible_spiking_vct)-1
-        chosen_spiking_vct_idx = int(input("Choose a spiking vector: "))
+        decision_vct_idx = random.randint(1, possible_spiking_vct)-1
+        # decision_vct_idx = int(input("Choose a spiking vector: "))
 
-        self.chosen_spiking_vct = self.spikeable_mx[chosen_spiking_vct_idx]
+        self.decision_vct = self.spikeable_mx[decision_vct_idx]
+    
+    def update_delayed_indicator_vct(self):
+        self.delayed_indicator_vct = np.logical_or(
+            np.logical_and(self.delayed_indicator_vct, np.logical_not(self.indicator_vct)), 
+            np.logical_and(self.decision_vct, self.delay_status_vct > 0)
+        ).astype(int)
 
     def compute_indicator_vct(self):
         """
@@ -121,8 +129,7 @@ class MatrixSNPSystem:
 
         rule_status = np.logical_not(self.delay_status_vct).astype(int)
 
-        self.indicator_vct = np.multiply(
-            rule_status, self.chosen_spiking_vct).astype(int)
+        self.indicator_vct = np.multiply(self.decision_vct + self.delayed_indicator_vct, rule_status)
 
     def update_neuron_status_vct(self):
         """
@@ -141,27 +148,30 @@ class MatrixSNPSystem:
         Updates the delay status vector by decrementing each value by 1
         """
 
-        for rule_idx in range(self.rule_count):
-            if self.chosen_spiking_vct[rule_idx] == 1:
+        for rule_idx in range(len(self.delayed_indicator_vct)):
+            if self.delayed_indicator_vct[rule_idx] == 1:
                 neuron_idx = self.get_mapped_neuron(rule_idx)
-                neuron_is_open = self.neuron_status_vct[neuron_idx]
-                current_delay = self.delay_status_vct[rule_idx]
                 delay = self.rule_delay_vct[rule_idx]
                 for rule in self.neuron_rule_map[neuron_idx]:
-                    self.delay_status_vct[rule] = delay if neuron_is_open else current_delay - 1
-
-        # self.delay_status_vct = [delay if delay >= 0 else self.rule_delay_vct[rule_idx]
-        #                          for rule_idx, delay in enumerate(self.delay_status_vct)]
-
-    def init_delayed_spikeable(self) -> np.ndarray:
+                    self.delay_status_vct[rule] -= 1
+                
+        
+        for rule_idx in range(self.rule_count):
+            if self.decision_vct[rule_idx] == 1:
+                neuron_idx = self.get_mapped_neuron(rule_idx)
+                delay = self.rule_delay_vct[rule_idx]
+                for rule in self.neuron_rule_map[neuron_idx]:
+                    self.delay_status_vct[rule] = delay
+        
+    def init_delayed_indicator_vct(self):
         """
         Initializes the delayed spikeable vector to all zeros
         with a length equal to the number of rules
         """
-        delayed_spikeable = np.zeros((self.rule_count, ))
-        return delayed_spikeable
+        delayed_indicator_vct = np.zeros((self.rule_count, ))
+        return delayed_indicator_vct
 
-    def init_neuron_status_vct(self) -> np.ndarray:
+    def init_neuron_status_vct(self):
         """
         Initializes the neuron status vector to all ones
         with a length equal to the number of neurons
@@ -169,7 +179,7 @@ class MatrixSNPSystem:
         neuron_status_vct = np.ones((self.neuron_count, ))
         return neuron_status_vct
 
-    def init_delay_status_vct(self) -> np.ndarray:
+    def init_delay_status_vct(self):
         """
         Initializes the delay status vector to all zeros 
         with a length equal to the number of rules
@@ -190,8 +200,9 @@ class MatrixSNPSystem:
 
             bound = self.rules[rule]['bound']
             spikes = self.config_vct[neuron_idx]
-            rule_validity = self.check_rule_validity(
-                bound, spikes)
+            neuron_status = self.neuron_status_vct[neuron_idx]
+            rule_validity = np.multiply(neuron_status, self.check_rule_validity(
+                bound, spikes)).astype(int)
             activatable_rules_mx[rule_idx, neuron_idx] = rule_validity
             active_rules_in_neuron[neuron_idx] += rule_validity
         return activatable_rules_mx, active_rules_in_neuron
@@ -209,14 +220,14 @@ class MatrixSNPSystem:
             if activatable_count[neuron_idx] == 0:
                 continue
 
-            functions = self.get_active_rules(
+            rules = self.get_active_rules(
                 neuron_idx, activatable_rules)
             amount = temp_comb_count/activatable_count[neuron_idx]
             repeats = comb_count/temp_comb_count
             index_i = 0
 
             for _ in range(int(repeats)):
-                for index_j in functions:
+                for index_j in rules:
                     counter = 0
                     while counter < amount:
                         self.spikeable_mx[index_i, index_j] = 1
@@ -246,7 +257,7 @@ class MatrixSNPSystem:
                 self.adj_mx[neuron_idx], production)
             self.trans_mx[rule_idx, neuron_idx] = consumption
 
-    def init_config_mx(self) -> np.ndarray:
+    def init_config_mx(self):
         """
         Creates a matrix of initial neuron configurations
         """
@@ -254,7 +265,7 @@ class MatrixSNPSystem:
             [self.parse_spike(self.neurons[neuron].content) for neuron in self.neurons])
         return config_vct
 
-    def init_adj_mx(self) -> np.ndarray:
+    def init_adj_mx(self):
         """
         Creates an adjacency matrix of the neurons of the system
         """
@@ -267,7 +278,7 @@ class MatrixSNPSystem:
             adj_mx[source, target] = self.synapses[synapse].weight
         return adj_mx
 
-    def parse_bound(self, definition: str) -> str:
+    def parse_bound(self, definition: str):
         """
         Performs regex matching on the rule definition to get its bound
         """
@@ -277,7 +288,7 @@ class MatrixSNPSystem:
             return ""
         return result.group('bound') or result.group('consumption_bound')
 
-    def parse_spike(self, content: str) -> int:
+    def parse_spike(self, content: str):
         """
         Performs regex matching on the initial contents 
         of the neurons to get the number of spikes
@@ -291,7 +302,7 @@ class MatrixSNPSystem:
             return spike
         return 0
 
-    def parse_rule(self, definition: str) -> tuple[int, int, int]:
+    def parse_rule(self, definition: str):
         """
         Performs regex matching on the rule definition to get 
         the consumption, production and delay values
@@ -307,14 +318,14 @@ class MatrixSNPSystem:
             'consumed_multiple') or 1
         production = result.group('produced_single') or result.group(
             'produced_multiple') or 1 if not result.group('forgot') else 0
-        delay = int(result.group('delay') or 1)
+        delay = int(result.group('delay') or 0)
 
         consumption = -int(consumption)
         production = int(production)
 
         return consumption, production, delay
 
-    def check_rule_validity(self, bound: str, spikes: int) -> bool:
+    def check_rule_validity(self, bound: str, spikes: int):
         """
         Performs regex matching to check 
         if the number of spikes inside neuron
@@ -350,7 +361,7 @@ class MatrixSNPSystem:
                                     rule) for rule in self.neurons[neuron].rules]
                                 for neuron in self.neurons}
 
-    def get_active_rules(self, neuron, active) -> list[int]:
+    def get_active_rules(self, neuron, active):
         """
         Returns the indices of the active rules of a neuron
         """
@@ -358,14 +369,14 @@ class MatrixSNPSystem:
         indices = [index for index, rule in enumerate(active) if rule]
         return indices
 
-    def get_mapped_neuron(self, rule_idx: str) -> int:
+    def get_mapped_neuron(self, rule_idx: str):
         neuron_idx = next(
             key for key, val in self.neuron_rule_map.items() if rule_idx in val)
         return neuron_idx
 
 
 if __name__ == '__main__':
-    with open('tests/test5.json', 'r') as f:
+    with open('tests/test3.json', 'r') as f:
         raw = json.load(f)
         data = SNPSystem(**raw)  # type: ignore
 

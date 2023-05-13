@@ -1,79 +1,54 @@
 {
-  "neurons": {
-    "n1": {
-      "type": "center",
-      "content": "a^{2}",
-      "rules": {
-        "r1": {
-          "definition": "a^2/a->a;1"
-        },
-        "r2": {
-          "definition": "a->0"
-        }
-      }
+  "nodes": [
+    {
+      "id": "n1",
+      "nodeType": "regular",
+      "content": 2,
+      "rules": ["a^2/a \\to a;1", "a \\to 0"]
     },
-    "n2": {
-      "type": "center",
-      "content": "a",
-      "rules": {
-        "r3": {
-          "definition": "a->a;1"
-        },
-        "r4": {
-          "definition": "a->a;2"
-        }
-      }
+    {
+      "id": "n2",
+      "nodeType": "regular",
+      "content": 1,
+      "rules": ["a \\to a;1", "a \\to a;2"]
     },
-    "n3": {
-      "type": "center",
-      "content": "a^{3}",
-      "rules": {
-        "r5": {
-          "definition": "a^3->a;0"
-        },
-        "r6": {
-          "definition": "a->a;2"
-        },
-        "r7": {
-          "definition": "a^2->0"
-        }
-      }
+    {
+      "id": "n3",
+      "nodeType": "regular",
+      "content": 3,
+      "rules": ["a^3 \\to a;0", "a \\to a;2", "a^2 \\to 0"]
     },
-    "out": {
-      "type": "output",
-      "content": "",
-      "rules": {
-        "r8": {
-          "definition": "a->a;0"
-        }
-      }
+    {
+      "id": "out",
+      "nodeType": "output",
+      "content": 0
     }
-  },
-  "synapses": {
-    "n1_n2": {
+  ],
+  "edges": [
+    {
       "source": "n1",
       "target": "n2",
-      "weight": 1
+      "label": 1
     },
-    "n1_n3": {
+    {
       "source": "n1",
       "target": "n3",
-      "weight": 1
+      "label": 1
     },
-    "n2_n1": {
+    {
       "source": "n2",
       "target": "n1",
-      "weight": 1
+      "label": 1
     },
-    "n2_n3": {
+    {
       "source": "n2",
       "target": "n3",
-      "weight": 1
+      "label": 1
     },
-    "n3_out": {
+    {
       "source": "n3",
       "target": "out",
-      "weight": 1
+      "label": 1
     }
-  }
+  ]
 }
