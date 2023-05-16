@@ -6,7 +6,7 @@ class Neuron(BaseModel):
     id: str
     content: int
     nodeType: Literal["input", "output", "regular"]
-    rules: Optional[List[str]] = None
+    rules: List[str]
 
 
 class Synapse(BaseModel):
