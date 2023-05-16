@@ -26,11 +26,13 @@ async def root():
 async def simulate_all(system: SNPSystem):
     matrixSNP = MatrixSNPSystem(system)
     matrixSNP.simulate_all()
-    print(matrixSNP.neuron_states)
-    print(matrixSNP.configurations)
+
+    print(matrixSNP.states)
+    print(matrixSNP.contents)
+
     return {
-        "states": matrixSNP.neuron_states.tolist(),
-        "configurations": matrixSNP.configurations.tolist(),
+        "states": matrixSNP.states.tolist(),
+        "configurations": matrixSNP.contents.tolist(),
         "keys": matrixSNP.neuron_keys,
     }
 
@@ -39,8 +41,11 @@ async def simulate_all(system: SNPSystem):
 async def simulate_step(system: SNPSystem):
     matrixSNP = MatrixSNPSystem(system)
     matrixSNP.simulate()
+
+    print(matrixSNP.state)
+    print(matrixSNP.content)
     return {
-        "states": matrixSNP.neuron_states.tolist(),
-        "configurations": matrixSNP.configurations.tolist(),
+        "states": matrixSNP.state.tolist(),
+        "configurations": matrixSNP.content.tolist(),
         "keys": matrixSNP.neuron_keys,
     }

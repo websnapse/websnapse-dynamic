@@ -4,9 +4,10 @@ from typing import Literal, List, Optional
 
 class Neuron(BaseModel):
     id: str
-    content: int
+    content: Optional[int] = None
     nodeType: Literal["input", "output", "regular"]
     rules: List[str]
+    spiketrain: Optional[str] = ""
 
 
 class Synapse(BaseModel):

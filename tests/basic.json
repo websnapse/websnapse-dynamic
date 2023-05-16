@@ -3,7 +3,13 @@
     {
       "id": "in",
       "nodeType": "input",
-      "spiketrain": 10001001,
+      "spiketrain": 10001010,
+      "rules": ["a \\to a;0"]
+    },
+    {
+      "id": "n1",
+      "nodeType": "regular",
+      "content": 2,
       "rules": ["a \\to a;0"]
     },
     {
@@ -16,6 +22,11 @@
     {
       "source": "in",
       "target": "out",
+      "label": 1
+    },
+    {
+      "source": "in",
+      "target": "n1",
       "label": 1
     }
   ]
