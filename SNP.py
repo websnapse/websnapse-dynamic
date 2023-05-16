@@ -25,7 +25,8 @@ class MatrixSNPSystem:
         self.states = np.zeros([1, self.neuron_count], dtype=object)
         self.halted = False
 
-        # self.print_system()
+        self.print_system()
+        print("++")
 
     def print_system(self):
         print("Neurons:")
@@ -305,7 +306,7 @@ class MatrixSNPSystem:
         self.rules: Dict[str, Dict[str, Union[str, int]]] = {}
         self.neuron_rule_map: Dict[int, list[int]] = {}
         for neuron_idx, n in enumerate(self.neurons):
-            if n.nodeType:
+            if n.nodeType == "regular":
                 self.neuron_rule_map[neuron_idx] = []
                 for rule in n.rules:
                     bound, consumption, production, delay = parse_rule(rule)
@@ -317,6 +318,27 @@ class MatrixSNPSystem:
                     }
                     self.neuron_rule_map[neuron_idx].append(self.rule_count)
                     self.rule_count += 1
+            elif n.nodeType == "input":
+                self.neuron_rule_map[neuron_idx] = []
+                self.rules[f"r{self.rule_count}"] = {
+                    "bound": ".+",
+                    "consumption": -1,
+                    "production": 1,
+                    "delay": 0,
+                }
+                self.neuron_rule_map[neuron_idx].append(self.rule_count)
+                self.rule_count += 1
+            elif n.nodeType == "output":
+                self.neuron_rule_map[neuron_idx] = []
+                self.rules[f"r{self.rule_count}"] = {
+                    "bound": ".+",
+                    "consumption": -1,
+                    "production": 0,
+                    "delay": 0,
+                }
+                self.neuron_rule_map[neuron_idx].append(self.rule_count)
+                self.rule_count += 1
+
         self.rule_keys = list(self.rules.keys())
 
     def __init_adj_mx(self):

@@ -3,13 +3,11 @@
     {
       "id": "in",
       "nodeType": "input",
-      "spiketrain": 10001001,
-      "rules": ["a \\to a;0"]
+      "spiketrain": "10001001"
     },
     {
       "id": "out",
-      "nodeType": "output",
-      "rules": ["a \\to 0"]
+      "nodeType": "output"
     }
   ],
   "edges": [

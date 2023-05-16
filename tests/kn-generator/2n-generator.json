@@ -4,24 +4,23 @@
       "id": "n1",
       "nodeType": "regular",
       "content": 2,
-      "rules": ["a^2/a \\to a;2", "a \\to 0"]
+      "rules": ["a^2/a \\to a;1", "a \\to 0"]
     },
     {
       "id": "n2",
       "nodeType": "regular",
       "content": 1,
-      "rules": ["a \\to a;2", "a \\to a;3"]
+      "rules": ["a \\to a;1", "a \\to a;2"]
     },
     {
       "id": "n3",
       "nodeType": "regular",
       "content": 3,
-      "rules": ["a^3 \\to a;0", "a \\to a;3", "a^2 \\to 0"]
+      "rules": ["a^3 \\to a;0", "a \\to a;2", "a^2 \\to 0"]
     },
     {
       "id": "out",
-      "nodeType": "output",
-      "rules": ["a \\to 0"]
+      "nodeType": "output"
     }
   ],
   "edges": [

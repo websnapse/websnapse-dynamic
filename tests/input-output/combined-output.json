@@ -1,0 +1,30 @@
+{
+  "nodes": [
+    {
+      "id": "in1",
+      "nodeType": "input",
+      "spiketrain": "10001001"
+    },
+    {
+      "id": "in2",
+      "nodeType": "input",
+      "spiketrain": "10001001"
+    },
+    {
+      "id": "out",
+      "nodeType": "output"
+    }
+  ],
+  "edges": [
+    {
+      "source": "in1",
+      "target": "out",
+      "label": 1
+    },
+    {
+      "source": "in2",
+      "target": "out",
+      "label": 1
+    }
+  ]
+}
