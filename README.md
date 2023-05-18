@@ -12,7 +12,7 @@
 
 1. Clone the repo
    ```sh
-   git clone
+   git clone https://github.com/websnapse/BackEnd.git
    ```
 2. Install Python packages
    ```sh
@@ -22,7 +22,15 @@
    ```sh
    uvicorn main:app --reload
    ```
-4. Open the browser and go to http://localhost:8000/
+4. Go to http://localhost:8000/docs/default/ to see the API documentation.
+
+5. Use Postman or any other API client to send requests to the API.
+
+### Routes
+
+- `POST` /simulate/
+- `POST` /simulate/last/
+- `POST` /simulate/step/
 
 ### Testing
 
