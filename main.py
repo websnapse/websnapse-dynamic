@@ -37,6 +37,18 @@ async def simulate_all(system: SNPSystem):
     }
 
 
+@app.post("/simulate/last")
+async def simulate_all(system: SNPSystem):
+    matrixSNP = MatrixSNPSystem(system)
+    matrixSNP.simulate_all()
+
+    print(matrixSNP.content)
+
+    return {
+        "contents": matrixSNP.content.tolist(),
+    }
+
+
 @app.post("/simulate/step")
 async def simulate_step(system: SNPSystem):
     matrixSNP = MatrixSNPSystem(system)

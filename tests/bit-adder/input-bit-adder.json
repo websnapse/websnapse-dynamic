@@ -1,15 +1,21 @@
 {
-  "expected": ["", "", "20020002"],
+  "expected": ["", "", 0, "00011"],
   "nodes": [
     {
       "id": "in1",
       "type": "input",
-      "spiketrain": "10001001"
+      "spiketrain": "1000"
     },
     {
       "id": "in2",
       "type": "input",
-      "spiketrain": "10001001"
+      "spiketrain": "100"
+    },
+    {
+      "id": "reg1",
+      "type": "regular",
+      "content": 0,
+      "rules": ["a/a \\to a;0", "a^2/a \\to a;0", "a^3/a^2 \\to a;0"]
     },
     {
       "id": "out",
@@ -20,11 +26,16 @@
   "edges": [
     {
       "source": "in1",
-      "target": "out",
+      "target": "reg1",
       "label": 1
     },
     {
       "source": "in2",
+      "target": "reg1",
+      "label": 1
+    },
+    {
+      "source": "reg1",
       "target": "out",
       "label": 1
     }

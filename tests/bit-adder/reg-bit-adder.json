@@ -1,0 +1,45 @@
+{
+  "expected": [0, 0, 0, "00011"],
+  "nodes": [
+    {
+      "id": "bin1",
+      "type": "regular",
+      "content": 4,
+      "rules": ["a^4 \\to a;2"]
+    },
+    {
+      "id": "bin2",
+      "type": "regular",
+      "content": 8,
+      "rules": ["a^8 \\to a;3"]
+    },
+    {
+      "id": "reg1",
+      "type": "regular",
+      "content": 0,
+      "rules": ["a \\to a;0", "a^2/a \\to a;0", "a^3/a^2 \\to a;0"]
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "spiketrain": ""
+    }
+  ],
+  "edges": [
+    {
+      "source": "bin1",
+      "target": "reg1",
+      "label": 1
+    },
+    {
+      "source": "bin2",
+      "target": "reg1",
+      "label": 1
+    },
+    {
+      "source": "reg1",
+      "target": "out",
+      "label": 1
+    }
+  ]
+}

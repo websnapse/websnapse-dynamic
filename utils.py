@@ -18,7 +18,7 @@ def parse_rule(definition: str):
     Performs regex matching on the rule definition to get
     the consumption, production and delay values
     """
-    pattern = r"^((?P<bound>.*)\/)?(?P<consumption_bound>[a-z](\^((?P<consumed_single>[^\D])|({(?P<consumed_multiple>[2-9]|[1-9][0-9]+)})))?) \\to (?P<production>([a-z]((\^((?P<produced_single>[^0,1,\D])|({(?P<produced_multiple>[2-9]|[1-9][0-9]+]*)})))?;(?P<delay>[0-9]|[1-9][0-9]*))|(?P<forgot>0)))$"
+    pattern = r"^((?P<bound>.*)\/)?(?P<consumption_bound>[a-z](\^((?P<consumed_single>[^\D])|({(?P<consumed_multiple>[2-9]|[1-9][0-9]+)})))?)\s*\\to\s*(?P<production>([a-z]((\^((?P<produced_single>[^0,1,\D])|({(?P<produced_multiple>[2-9]|[1-9][0-9]+]*)})))?;(?P<delay>[0-9]|[1-9][0-9]*))|(?P<forgot>0)))$"
 
     result = re.match(pattern, definition)
 

@@ -3,12 +3,14 @@ from utils import check_rule_validity, parse_rule
 import numpy as np
 import random
 from typing import Dict, Union
+import re
 
 
 class MatrixSNPSystem:
     def __init__(self, system: SNPSystem):
         self.neurons = system.nodes
         self.synapses = system.edges
+        self.expected = system.expected
 
         self.__set_neuron_order()
         self.__set_rule_order()
@@ -25,8 +27,8 @@ class MatrixSNPSystem:
         self.states = np.zeros([1, self.neuron_count], dtype=object)
         self.halted = False
 
-        self.print_system()
-        print("++")
+        # self.print_system()
+        # print("++")
 
     def print_system(self):
         print("Neurons:")
@@ -45,17 +47,17 @@ class MatrixSNPSystem:
 
     def simulate(self):
         self.__update_content()
-        self.__add_input_spiketrain()
         self.__compute_spikeable_mx()
         self.__choose_decision_vct()
         self.__update_delay_status_vct()
         self.__compute_indicator_vct()
+        self.__check_halt_conditions()
         self.__update_delayed_indicator_vct()
         self.__update_neuron_status_vct()
         self.__update_config_vct()
+        self.__add_input_spiketrain()
         self.__update_output_spiketrain()
         self.__update_neuron_states()
-        self.__check_halt_conditions()
 
     def simulate_all(self):
         """
@@ -71,10 +73,20 @@ class MatrixSNPSystem:
 
             iteration += 1
 
+    def validate_result(self):
+        """
+        Validates the result of the simulation
+        """
+        for i in range(self.neuron_count):
+            if re.match(str(self.expected[i]), str(self.content[i])) is None:
+                return False
+
+        return True
+
     def __check_halt_conditions(self):
         self.halted = (
             np.all(self.indicator_vct == 0)
-            and np.all(self.neuron_status_vct == 1)
+            and np.all(self.delay_status_vct == 0)
             and np.all(self.spike_train_vct[self.input_keys] == "")
         )
 
@@ -88,7 +100,8 @@ class MatrixSNPSystem:
     def __add_input_spiketrain(self):
         for i in self.input_keys:
             spike = self.spike_train_vct[i][-1:]
-            self.config_vct[i] = int(spike) if spike else 0
+            spike = int(spike) if spike else 0
+            self.config_vct += self.adj_mx[i] * spike
             self.spike_train_vct[i] = self.spike_train_vct[i][:-1]
 
     def __update_output_spiketrain(self):
@@ -97,6 +110,7 @@ class MatrixSNPSystem:
             self.config_vct[self.output_keys].astype(str),
         )
         self.spike_train_vct[self.output_keys] = spike
+        self.config_vct[self.output_keys] = 0
 
     def __update_neuron_states(self):
         self.state = np.where(self.neuron_status_vct == 0, -1, 0)
@@ -261,7 +275,7 @@ class MatrixSNPSystem:
         with a length equal to the number of neurons
         """
         spike_train_vct = np.array(
-            [n.spiketrain if n.nodeType == "input" else "" for n in self.neurons]
+            [n.spiketrain if n.type != "regular" else "" for n in self.neurons]
         ).astype(object)
         return spike_train_vct
 
@@ -272,7 +286,7 @@ class MatrixSNPSystem:
         # config_vct = np.array([n.content for n in self.neurons if n.type == 'regular' else n.spiketrain[:-1] if n.type == 'input' else 0])
 
         config_vct = np.array(
-            [n.content if n.nodeType == "regular" else 0 for n in self.neurons]
+            [n.content if n.type == "regular" else 0 for n in self.neurons]
         )
         return config_vct
 
@@ -284,17 +298,15 @@ class MatrixSNPSystem:
         self.regular_keys = [
             neuron_idx
             for neuron_idx, n in enumerate(self.neurons)
-            if n.nodeType == "regular"
+            if n.type == "regular"
         ]
         self.input_keys = [
-            neuron_idx
-            for neuron_idx, n in enumerate(self.neurons)
-            if n.nodeType == "input"
+            neuron_idx for neuron_idx, n in enumerate(self.neurons) if n.type == "input"
         ]
         self.output_keys = [
             neuron_idx
             for neuron_idx, n in enumerate(self.neurons)
-            if n.nodeType == "output"
+            if n.type == "output"
         ]
         self.neuron_count = len(self.neuron_keys)
 
@@ -306,7 +318,7 @@ class MatrixSNPSystem:
         self.rules: Dict[str, Dict[str, Union[str, int]]] = {}
         self.neuron_rule_map: Dict[int, list[int]] = {}
         for neuron_idx, n in enumerate(self.neurons):
-            if n.nodeType == "regular":
+            if n.type == "regular":
                 self.neuron_rule_map[neuron_idx] = []
                 for rule in n.rules:
                     bound, consumption, production, delay = parse_rule(rule)
@@ -318,21 +330,21 @@ class MatrixSNPSystem:
                     }
                     self.neuron_rule_map[neuron_idx].append(self.rule_count)
                     self.rule_count += 1
-            elif n.nodeType == "input":
+            elif n.type == "input":
                 self.neuron_rule_map[neuron_idx] = []
                 self.rules[f"r{self.rule_count}"] = {
                     "bound": ".+",
-                    "consumption": -1,
-                    "production": 1,
+                    "consumption": 0,
+                    "production": 0,
                     "delay": 0,
                 }
                 self.neuron_rule_map[neuron_idx].append(self.rule_count)
                 self.rule_count += 1
-            elif n.nodeType == "output":
+            elif n.type == "output":
                 self.neuron_rule_map[neuron_idx] = []
                 self.rules[f"r{self.rule_count}"] = {
                     "bound": ".+",
-                    "consumption": -1,
+                    "consumption": 0,
                     "production": 0,
                     "delay": 0,
                 }

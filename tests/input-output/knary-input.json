@@ -1,13 +1,15 @@
 {
+  "expected": ["", "20020222002"],
   "nodes": [
     {
       "id": "in",
-      "nodeType": "input",
+      "type": "input",
       "spiketrain": "20022202002"
     },
     {
       "id": "out",
-      "nodeType": "output"
+      "type": "output",
+      "spiketrain": ""
     }
   ],
   "edges": [
