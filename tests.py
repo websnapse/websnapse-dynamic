@@ -6,7 +6,6 @@ import json
 
 class TestSystem(unittest.TestCase):
     def test_something(self):
-        # Your test logic goes here
         pass
 
 

@@ -45,9 +45,8 @@ class MatrixSNPSystem:
         print("Rule Delays:")
         print(self.rule_delay_vct)
 
-    def simulate(self):
-        self.__update_content()
-        self.__compute_spikeable_mx()
+    def simulate_pseudorandom(self):
+        self.compute_spikeable_mx()
         self.__choose_decision_vct()
         self.__update_delay_status_vct()
         self.__compute_indicator_vct()
@@ -58,6 +57,7 @@ class MatrixSNPSystem:
         self.__add_input_spiketrain()
         self.__update_output_spiketrain()
         self.__update_neuron_states()
+        self.__update_content()
 
     def simulate_all(self):
         """
@@ -66,7 +66,7 @@ class MatrixSNPSystem:
 
         iteration = 0
         while True:
-            self.simulate()
+            self.simulate_pseudorandom()
 
             if self.halted:
                 break
@@ -184,11 +184,11 @@ class MatrixSNPSystem:
                 for rule in self.neuron_rule_map[neuron_idx]:
                     self.delay_status_vct[rule] = delay
 
-    def __compute_spikeable_mx(self):
+    def compute_spikeable_mx(self):
         """
         Creates a matrix of all possible combinations of rules that can be activated
         """
-        activatable_rules, activatable_count = self.__get_activatable_rules()
+        activatable_rules, activatable_count = self.get_activatable_rules()
         comb_count = np.prod(activatable_count, where=activatable_count > 0)
         self.spikeable_mx = np.zeros((int(comb_count), self.rule_count))
         temp_comb_count = comb_count
@@ -275,7 +275,7 @@ class MatrixSNPSystem:
         with a length equal to the number of neurons
         """
         spike_train_vct = np.array(
-            [n.spiketrain if n.type != "regular" else "" for n in self.neurons]
+            [n.content if n.type != "regular" else "" for n in self.neurons]
         ).astype(object)
         return spike_train_vct
 
@@ -362,10 +362,42 @@ class MatrixSNPSystem:
         for synapse in self.synapses:
             source = self.neuron_keys.index(synapse.source)
             target = self.neuron_keys.index(synapse.target)
-            adj_mx[source, target] = synapse.label
+            adj_mx[source, target] = synapse.weight
         return adj_mx
 
-    def __get_activatable_rules(self):
+    def check_non_determinism(self):
+        """
+        Checks if multiple rules are applicable in each neuron. Returns the list of neurons with non-determinism along with their rules.
+        """
+        non_deterministic_neurons = {}
+        for neuron_idx, neuron in enumerate(self.neurons):
+            if neuron.type == "regular":
+                applicable_rules = []
+                for rule_idx, _ in enumerate(neuron.rules):
+                    rule = f"r{self.neuron_rule_map[neuron_idx][rule_idx]}"
+                    bound: str = str(self.rules[rule]["bound"])
+                    spikes: int = self.config_vct[neuron_idx]
+                    neuron_status: int = self.neuron_status_vct[neuron_idx]
+                    rule_validity = np.multiply(
+                        neuron_status, check_rule_validity(bound, spikes)
+                    ).astype(int)
+                    if rule_validity:
+                        applicable_rules.append(rule_idx)
+                if len(applicable_rules) > 1:
+                    non_deterministic_neurons[neuron.id] = applicable_rules
+                elif len(applicable_rules) == 1:
+                    non_deterministic_neurons[neuron.id] = applicable_rules[0]
+        return non_deterministic_neurons
+
+    def create_spiking_vector(self, choice: dict):
+        spiking_vector = np.zeros((self.rule_count,)).astype(int)
+        for neuron in choice:
+            neuron_idx = self.neuron_keys.index(neuron)
+            rule_idx = self.neuron_rule_map[neuron_idx][choice[neuron]]
+            spiking_vector[rule_idx] = 1
+        return spiking_vector
+
+    def get_activatable_rules(self):
         """
         Returns a matrix of rules that are activatable by the current configuration
         """
