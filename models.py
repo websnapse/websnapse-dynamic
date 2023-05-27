@@ -5,13 +5,13 @@ from typing import Literal, List, Union, Optional
 class InputNeuron(BaseModel):
     id: str
     type: Literal["input"]
-    spiketrain: str
+    content: str
 
 
 class OutputNeuron(BaseModel):
     id: str
     type: Literal["output"]
-    spiketrain: str
+    content: str
 
 
 class RegularNeuron(BaseModel):
@@ -24,7 +24,7 @@ class RegularNeuron(BaseModel):
 class Synapse(BaseModel):
     source: str
     target: str
-    label: float
+    weight: float
 
 
 class SNPSystem(BaseModel):

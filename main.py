@@ -100,8 +100,6 @@ async def websocket_endpoint(websocket: WebSocket):
     matrixSNP = MatrixSNPSystem(SNPSystem(**data))
     while True:
         try:
-            await asyncio.sleep(1)
-
             matrixSNP.simulate_pseudorandom()
 
             configs = {}
