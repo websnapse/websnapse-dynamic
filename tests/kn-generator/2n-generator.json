@@ -1,6 +1,5 @@
 {
-  "expected": [0, 0, 0, "1(0{2})*010"],
-  "neurons": [
+  "nodes": [
     {
       "id": "n1",
       "type": "regular",
@@ -27,28 +26,28 @@
   ],
   "synapses": [
     {
-      "source": "n1",
-      "target": "n2",
+      "from": "n1",
+      "to": "n2",
       "weight": 1
     },
     {
-      "source": "n1",
-      "target": "n3",
+      "from": "n1",
+      "to": "n3",
       "weight": 1
     },
     {
-      "source": "n2",
-      "target": "n1",
+      "from": "n2",
+      "to": "n1",
       "weight": 1
     },
     {
-      "source": "n2",
-      "target": "n3",
+      "from": "n2",
+      "to": "n3",
       "weight": 1
     },
     {
-      "source": "n3",
-      "target": "out",
+      "from": "n3",
+      "to": "out",
       "weight": 1
     }
   ]

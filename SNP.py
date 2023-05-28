@@ -9,7 +9,7 @@ import re
 class MatrixSNPSystem:
     def __init__(self, system: SNPSystem):
         self.neurons = system.nodes
-        self.synapses = system.edges
+        self.synapses = system.synapses
         self.expected = system.expected
 
         self.__set_neuron_order()
@@ -45,9 +45,12 @@ class MatrixSNPSystem:
         print("Rule Delays:")
         print(self.rule_delay_vct)
 
-    def simulate_pseudorandom(self):
+    def pseudorandom_simulate_next(self):
         self.compute_spikeable_mx()
         self.__choose_decision_vct()
+        self.compute_next_configuration()
+
+    def compute_next_configuration(self):
         self.__update_delay_status_vct()
         self.__compute_indicator_vct()
         self.__check_halt_conditions()
@@ -59,14 +62,10 @@ class MatrixSNPSystem:
         self.__update_neuron_states()
         self.__update_content()
 
-    def simulate_all(self):
-        """
-        Simulates the system for a single time step
-        """
-
+    def pseudorandom_simulate_all(self):
         iteration = 0
         while True:
-            self.simulate_pseudorandom()
+            self.pseudorandom_simulate_next()
 
             if self.halted:
                 break
@@ -360,8 +359,8 @@ class MatrixSNPSystem:
         adj_mx = np.zeros((self.neuron_count, self.neuron_count)).astype(int)
 
         for synapse in self.synapses:
-            source = self.neuron_keys.index(synapse.source)
-            target = self.neuron_keys.index(synapse.target)
+            source = self.neuron_keys.index(synapse.from_)
+            target = self.neuron_keys.index(synapse.to)
             adj_mx[source, target] = synapse.weight
         return adj_mx
 
@@ -395,7 +394,7 @@ class MatrixSNPSystem:
             neuron_idx = self.neuron_keys.index(neuron)
             rule_idx = self.neuron_rule_map[neuron_idx][choice[neuron]]
             spiking_vector[rule_idx] = 1
-        return spiking_vector
+        self.decision_vct = spiking_vector
 
     def get_activatable_rules(self):
         """

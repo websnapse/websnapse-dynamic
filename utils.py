@@ -18,22 +18,24 @@ def parse_rule(definition: str):
     Performs regex matching on the rule definition to get
     the consumption, production and delay values
     """
-    pattern = r"^((?P<bound>.*)\/)?(?P<consumption_bound>[a-z](\^((?P<consumed_single>[^\D])|({(?P<consumed_multiple>[2-9]|[1-9][0-9]+)})))?)\s*\\to\s*(?P<production>([a-z]((\^((?P<produced_single>[^0,1,\D])|({(?P<produced_multiple>[2-9]|[1-9][0-9]+]*)})))?;(?P<delay>[0-9]|[1-9][0-9]*))|(?P<forgot>0)))$"
+    pattern = r"^((?P<bound>.*)\/)?(?P<consumption_bound>[a-z](\^((?P<consumed_single>[^\D])|({(?P<consumed_multiple>[2-9]|[1-9][0-9]+)})))?)\s*\\to\s*(?P<production>([a-z]((\^((?P<produced_single>[^0,1,\D])|({(?P<produced_multiple>[2-9]|[1-9][0-9]+]*)})))?\s*;\s*(?P<delay>[0-9]|[1-9][0-9]*))|(?P<forgot>0)|(?P<lambda>\\lambda)))$"
 
     result = re.match(pattern, definition)
 
     if result is None:
         return tuple((0, 0, 0, 0))
 
+    forgetting = True if result.group("forgot") or result.group("lambda") else False
+
     consumption = (
         result.group("consumed_single") or result.group("consumed_multiple") or 1
     )
     production = (
         result.group("produced_single") or result.group("produced_multiple") or 1
-        if not result.group("forgot")
+        if not forgetting
         else 0
     )
-    delay = int(result.group("delay") or 1 if not result.group("forgot") else 0)
+    delay = int(result.group("delay") or 1 if not forgetting else 0)
 
     consumption = -int(consumption)
     production = int(production)

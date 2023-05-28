@@ -1,33 +1,21 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal, List, Union, Optional
 
 
-class InputNeuron(BaseModel):
+class Node(BaseModel):
     id: str
-    type: Literal["input"]
-    content: str
-
-
-class OutputNeuron(BaseModel):
-    id: str
-    type: Literal["output"]
-    content: str
-
-
-class RegularNeuron(BaseModel):
-    id: str
-    type: Literal["regular"]
-    content: int
-    rules: List[str]
+    type: Literal["input", "output", "regular"]
+    content: Union[int, str]
+    rules: Optional[List[str]]
 
 
 class Synapse(BaseModel):
-    source: str
-    target: str
+    from_: str = Field(..., alias="from")
+    to: str
     weight: float
 
 
 class SNPSystem(BaseModel):
-    nodes: List[Union[InputNeuron, OutputNeuron, RegularNeuron]]
-    edges: List[Synapse]
+    nodes: List[Node]
+    synapses: List[Synapse]
     expected: Optional[List[object]]

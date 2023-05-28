@@ -24,7 +24,7 @@ class TestSuite(unittest.TestSuite):
             def test_system(self):
                 system = SNPSystem(**data)
                 matrixSNP = MatrixSNPSystem(system)
-                matrixSNP.simulate_all()
+                matrixSNP.pseudorandom_simulate_all()
                 self.assertTrue(matrixSNP.validate_result())
 
             setattr(TestSystem, f"test_{file_name}", test_system)

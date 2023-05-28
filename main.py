@@ -26,7 +26,7 @@ async def root():
 @app.post("/simulate")
 async def simulate_all(system: SNPSystem):
     matrixSNP = MatrixSNPSystem(system)
-    matrixSNP.simulate_all()
+    matrixSNP.pseudorandom_simulate_all()
 
     print(matrixSNP.states)
     print(matrixSNP.contents)
@@ -41,7 +41,7 @@ async def simulate_all(system: SNPSystem):
 @app.post("/simulate/last")
 async def simulate_all(system: SNPSystem):
     matrixSNP = MatrixSNPSystem(system)
-    matrixSNP.simulate_all()
+    matrixSNP.pseudorandom_simulate_all()
 
     print(matrixSNP.content)
 
@@ -53,7 +53,7 @@ async def simulate_all(system: SNPSystem):
 @app.post("/simulate/step")
 async def simulate_step(system: SNPSystem):
     matrixSNP = MatrixSNPSystem(system)
-    matrixSNP.simulate_pseudorandom()
+    matrixSNP.compute_next_configuration()
 
     print(matrixSNP.state)
     print(matrixSNP.content)
@@ -81,15 +81,17 @@ async def check(system: SNPSystem):
         "n3": 0,
     }
     print(choice)
-    spiking_vector = matrixSNP.create_spiking_vector(choice)
-    print(spiking_vector)
+    matrixSNP.create_spiking_vector(choice)
+    matrixSNP.compute_next_configuration()
+    print(matrixSNP.state)
+    print(matrixSNP.content)
+    print(matrixSNP.halted)
 
 
-@app.websocket("/simulate/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    matrixSNP = None
+@app.websocket("/ws/simulate/guided")
+async def guided_mode(websocket: WebSocket):
     status = {
-        "1": "animate",
+        "1": "spiking",
         "0": "default",
         "-1": "closed",
     }
@@ -100,7 +102,58 @@ async def websocket_endpoint(websocket: WebSocket):
     matrixSNP = MatrixSNPSystem(SNPSystem(**data))
     while True:
         try:
-            matrixSNP.simulate_pseudorandom()
+            await asyncio.sleep(1)
+            matrixSNP.compute_spikeable_mx()
+            choices = matrixSNP.spikeable_mx.shape[0]
+            if choices > 1:
+                spikeable = matrixSNP.check_non_determinism()
+                await websocket.send_json({"type": "prompt", "choices": spikeable})
+                choice = await websocket.receive_json()
+                matrixSNP.create_spiking_vector(choice)
+            else:
+                matrixSNP.decision_vct = matrixSNP.spikeable_mx[0]
+            matrixSNP.compute_next_configuration()
+
+            configs = {}
+            states = {}
+            for key, state, content in zip(
+                matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
+            ):
+                configs[key] = content
+                states[key] = status[str(state)]
+
+            await websocket.send_json(
+                {
+                    "type": "step",
+                    "states": states,
+                    "configurations": configs,
+                    "halted": bool(matrixSNP.halted),
+                }
+            )
+            if matrixSNP.halted:
+                print("stop")
+                break
+        except:
+            websocket.close()
+            break
+
+
+@app.websocket("/ws/simulate/pseudorandom")
+async def pseudorandom_mode(websocket: WebSocket):
+    status = {
+        "1": "spiking",
+        "0": "default",
+        "-1": "closed",
+    }
+
+    await websocket.accept()
+
+    data = await websocket.receive_json()
+    matrixSNP = MatrixSNPSystem(SNPSystem(**data))
+    while True:
+        try:
+            await asyncio.sleep(1)
+            matrixSNP.pseudorandom_simulate_next()
 
             configs = {}
             states = {}
