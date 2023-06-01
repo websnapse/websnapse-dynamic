@@ -17,6 +17,14 @@ app.add_middleware(  # type: ignore
     allow_headers=["*"],
 )
 
+status = {
+    "1": "spiking",
+    "0": "default",
+    "-1": "closed",
+}
+
+resume_event = asyncio.Event()
+
 
 @app.get("/")
 async def root():
@@ -88,97 +96,192 @@ async def check(system: SNPSystem):
     print(matrixSNP.halted)
 
 
+async def prev(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
+    matrixSNP.compute_prev_configuration()
+
+    configs = {}
+    states = {}
+    for key, state, content in zip(
+        matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
+    ):
+        configs[key] = {
+            "content": content,
+            "delay": 0,
+        }
+        states[key] = status[str(state)]
+
+    await websocket.send_json(
+        {
+            "states": states,
+            "configurations": configs,
+            "halted": bool(matrixSNP.halted),
+        }
+    )
+
+
+async def continue_simulate_guided(
+    websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int
+):
+    print(speed)
+    while True:
+        await next_guided(websocket, matrixSNP)
+        if matrixSNP.halted:
+            break
+        await asyncio.sleep(1 / speed)
+
+
+async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
+    matrixSNP.compute_spikeable_mx()
+    choices = matrixSNP.spikeable_mx.shape[0]
+    if choices > 1:
+        spikeable = matrixSNP.check_non_determinism()
+        await websocket.send_json({"type": "prompt", "choices": spikeable})
+        await resume_event.wait()
+        resume_event.clear()
+    else:
+        matrixSNP.decision_vct = matrixSNP.spikeable_mx[0]
+    matrixSNP.compute_next_configuration()
+
+    configs = {}
+    states = {}
+    for key, state, content in zip(
+        matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
+    ):
+        configs[key] = {
+            "content": content,
+            "delay": 0,
+        }
+        states[key] = status[str(state)]
+
+    await websocket.send_json(
+        {
+            "type": "step",
+            "states": states,
+            "configurations": configs,
+            "halted": bool(matrixSNP.halted),
+        }
+    )
+
+
 @app.websocket("/ws/simulate/guided")
 async def guided_mode(websocket: WebSocket):
-    status = {
-        "1": "spiking",
-        "0": "default",
-        "-1": "closed",
-    }
-
     await websocket.accept()
 
     req = await websocket.receive_json()
-
+    data = req["data"]
+    speed = req["speed"]
     matrixSNP = MatrixSNPSystem(SNPSystem(**req["data"]))
+    simulating = True
+    simulating_task = asyncio.create_task(
+        continue_simulate_guided(websocket, matrixSNP, speed)
+    )
     while True:
         try:
-            matrixSNP.compute_spikeable_mx()
-            choices = matrixSNP.spikeable_mx.shape[0]
-            if choices > 1:
-                spikeable = matrixSNP.check_non_determinism()
-                await websocket.send_json({"type": "prompt", "choices": spikeable})
-                choice = await websocket.receive_json()
+            data = await websocket.receive_json()
+            cmd = data["cmd"]
+
+            if cmd == "stop" and simulating:
+                simulating_task.cancel()
+                simulating = False
+            elif cmd == "continue" and not simulating:
+                simulating_task = asyncio.create_task(
+                    continue_simulate_guided(websocket, matrixSNP, speed)
+                )
+            elif cmd == "next":
+                simulating_task.cancel()
+                simulating_task = asyncio.create_task(next_guided(websocket, matrixSNP))
+            elif cmd == "choice":
+                choice = data["choice"]
                 matrixSNP.create_spiking_vector(choice)
-            else:
-                matrixSNP.decision_vct = matrixSNP.spikeable_mx[0]
-            matrixSNP.compute_next_configuration()
+                resume_event.set()
+            elif cmd == "prev":
+                simulating_task.cancel()
+                simulating_task = asyncio.create_task(prev(websocket, matrixSNP))
+            elif cmd == "speed":
+                speed = data["speed"]
+                simulating_task.cancel()
+                simulating_task = asyncio.create_task(
+                    continue_simulate_guided(websocket, matrixSNP, speed)
+                )
 
-            configs = {}
-            states = {}
-            for key, state, content in zip(
-                matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
-            ):
-                configs[key] = {
-                    "content": content,
-                    "delay": 0,
-                }
-                states[key] = status[str(state)]
-
-            await websocket.send_json(
-                {
-                    "type": "step",
-                    "states": states,
-                    "configurations": configs,
-                    "halted": bool(matrixSNP.halted),
-                }
-            )
-            if matrixSNP.halted:
-                print("stop")
-                break
-            await asyncio.sleep(int(req["duration"]) / 1000)
         except:
-            websocket.close()
+            await websocket.close()
             break
+
+
+async def continue_simulate_pseudorandom(
+    websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int
+):
+    print(speed)
+    while True:
+        await next_pseudorandom(websocket, matrixSNP)
+        if matrixSNP.halted:
+            break
+        await asyncio.sleep(1 / speed)
+
+
+async def next_pseudorandom(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
+    matrixSNP.pseudorandom_simulate_next()
+
+    configs = {}
+    states = {}
+    for key, state, content in zip(
+        matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
+    ):
+        configs[key] = {
+            "content": content,
+            "delay": 0,
+        }
+        states[key] = status[str(state)]
+
+    await websocket.send_json(
+        {
+            "states": states,
+            "configurations": configs,
+            "halted": bool(matrixSNP.halted),
+        }
+    )
 
 
 @app.websocket("/ws/simulate/pseudorandom")
 async def pseudorandom_mode(websocket: WebSocket):
-    status = {
-        "1": "spiking",
-        "0": "default",
-        "-1": "closed",
-    }
-
     await websocket.accept()
 
     req = await websocket.receive_json()
-    matrixSNP = MatrixSNPSystem(SNPSystem(**req["data"]))
+    system = req["data"]
+    speed = req["speed"]
+    matrixSNP = MatrixSNPSystem(SNPSystem(**system))
+    simulating = True
+    simulating_task = asyncio.create_task(
+        continue_simulate_pseudorandom(websocket, matrixSNP, speed)
+    )
     while True:
         try:
-            matrixSNP.pseudorandom_simulate_next()
+            data = await websocket.receive_json()
+            cmd = data["cmd"]
 
-            configs = {}
-            states = {}
-            for key, state, content in zip(
-                matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
-            ):
-                configs[key] = {
-                    "content": content,
-                    "delay": 0,
-                }
-                states[key] = status[str(state)]
+            if cmd == "stop" and simulating:
+                simulating_task.cancel()
+                simulating = False
+            elif cmd == "continue" and not simulating:
+                simulating_task = asyncio.create_task(
+                    continue_simulate_pseudorandom(websocket, matrixSNP, speed)
+                )
+            elif cmd == "next":
+                simulating_task.cancel()
+                simulating_task = asyncio.create_task(
+                    next_pseudorandom(websocket, matrixSNP)
+                )
+            elif cmd == "prev":
+                simulating_task.cancel()
+                simulating_task = asyncio.create_task(prev(websocket, matrixSNP))
+            elif cmd == "speed":
+                speed = data["speed"]
+                simulating_task.cancel()
+                simulating_task = asyncio.create_task(
+                    continue_simulate_pseudorandom(websocket, matrixSNP, speed)
+                )
 
-            await websocket.send_json(
-                {
-                    "states": states,
-                    "configurations": configs,
-                    "halted": bool(matrixSNP.halted),
-                }
-            )
-            if matrixSNP.halted:
-                break
-            await asyncio.sleep(int(req["duration"]) / 1000)
         except:
-            websocket.close()
+            await websocket.close()
             break

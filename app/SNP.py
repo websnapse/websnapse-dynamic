@@ -26,8 +26,10 @@ class MatrixSNPSystem:
         self.contents = np.empty((0, self.neuron_count), dtype=object)
         self.states = np.zeros([1, self.neuron_count], dtype=object)
         self.halted = False
+        self.iteration = 0
+        self.cursor = 0
 
-        # TODO: Create a neuron-wise delay status vector
+        # TODO Create a neuron-wise delay status vector
 
         # self.print_system()
         # print("++")
@@ -53,16 +55,29 @@ class MatrixSNPSystem:
         self.compute_next_configuration()
 
     def compute_next_configuration(self):
-        self.__update_delay_status_vct()
-        self.__compute_indicator_vct()
-        self.__check_halt_conditions()
-        self.__update_delayed_indicator_vct()
-        self.__update_neuron_status_vct()
-        self.__update_config_vct()
-        self.__add_input_spiketrain()
-        self.__update_output_spiketrain()
-        self.__update_neuron_states()
-        self.__update_content()
+        if self.iteration == self.cursor:
+            self.iteration += 1
+            self.__update_delay_status_vct()
+            self.__compute_indicator_vct()
+            self.__check_halt_conditions()
+            self.__update_delayed_indicator_vct()
+            self.__update_neuron_status_vct()
+            self.__update_config_vct()
+            self.__add_input_spiketrain()
+            self.__update_output_spiketrain()
+            self.__update_neuron_states()
+            self.__update_content()
+        else:
+            self.content = self.contents[self.cursor]
+            self.state = self.states[self.cursor]
+        self.cursor += 1
+
+    def compute_prev_configuration(self):
+        if self.cursor == 0:
+            return
+        self.cursor -= 1
+        self.content = self.contents[self.cursor]
+        self.state = self.states[self.cursor]
 
     def pseudorandom_simulate_all(self):
         iteration = 0
