@@ -16,6 +16,6 @@ class Synapse(BaseModel):
 
 
 class SNPSystem(BaseModel):
-    nodes: List[Node]
+    neurons: List[Node]
     synapses: List[Synapse]
     expected: Optional[List[object]]

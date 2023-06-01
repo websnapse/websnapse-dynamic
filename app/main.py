@@ -1,8 +1,8 @@
 import asyncio
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from models import SNPSystem
+from app.models import SNPSystem
 from fastapi.middleware.cors import CORSMiddleware
-from SNP import MatrixSNPSystem
+from app.SNP import MatrixSNPSystem
 
 app = FastAPI()
 origins = [
@@ -98,11 +98,11 @@ async def guided_mode(websocket: WebSocket):
 
     await websocket.accept()
 
-    data = await websocket.receive_json()
-    matrixSNP = MatrixSNPSystem(SNPSystem(**data))
+    req = await websocket.receive_json()
+
+    matrixSNP = MatrixSNPSystem(SNPSystem(**req["data"]))
     while True:
         try:
-            await asyncio.sleep(1)
             matrixSNP.compute_spikeable_mx()
             choices = matrixSNP.spikeable_mx.shape[0]
             if choices > 1:
@@ -119,7 +119,10 @@ async def guided_mode(websocket: WebSocket):
             for key, state, content in zip(
                 matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
             ):
-                configs[key] = content
+                configs[key] = {
+                    "content": content,
+                    "delay": 0,
+                }
                 states[key] = status[str(state)]
 
             await websocket.send_json(
@@ -133,6 +136,7 @@ async def guided_mode(websocket: WebSocket):
             if matrixSNP.halted:
                 print("stop")
                 break
+            await asyncio.sleep(int(req["duration"]) / 1000)
         except:
             websocket.close()
             break
@@ -148,11 +152,10 @@ async def pseudorandom_mode(websocket: WebSocket):
 
     await websocket.accept()
 
-    data = await websocket.receive_json()
-    matrixSNP = MatrixSNPSystem(SNPSystem(**data))
+    req = await websocket.receive_json()
+    matrixSNP = MatrixSNPSystem(SNPSystem(**req["data"]))
     while True:
         try:
-            await asyncio.sleep(1)
             matrixSNP.pseudorandom_simulate_next()
 
             configs = {}
@@ -160,7 +163,10 @@ async def pseudorandom_mode(websocket: WebSocket):
             for key, state, content in zip(
                 matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
             ):
-                configs[key] = content
+                configs[key] = {
+                    "content": content,
+                    "delay": 0,
+                }
                 states[key] = status[str(state)]
 
             await websocket.send_json(
@@ -172,6 +178,7 @@ async def pseudorandom_mode(websocket: WebSocket):
             )
             if matrixSNP.halted:
                 break
+            await asyncio.sleep(int(req["duration"]) / 1000)
         except:
             websocket.close()
             break

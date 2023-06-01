@@ -1,4 +1,4 @@
-import regex as re
+import re
 
 
 def check_rule_validity(bound: str, spikes: int):
@@ -7,8 +7,8 @@ def check_rule_validity(bound: str, spikes: int):
     if the number of spikes inside neuron
     satisfies the bound of the rule
     """
-    bound = re.sub("\\^(\\d)", "^{\\1}", bound)
-    parsedBound = f"^{bound.replace('^', '')}$"
+    bound = re.sub("\\^(\\d)", "^{\\1}", bound).replace("^", "").replace("{\\ast}", "*")
+    parsedBound = f"^{bound}$"
     validity = re.match(parsedBound, "a" * spikes)
     return validity is not None
 
@@ -28,10 +28,10 @@ def parse_rule(definition: str):
     forgetting = True if result.group("forgot") or result.group("lambda") else False
 
     consumption = (
-        result.group("consumed_single") or result.group("consumed_multiple") or 1
+        result.group("consumed_multiple") or result.group("consumed_single") or 1
     )
     production = (
-        result.group("produced_single") or result.group("produced_multiple") or 1
+        result.group("produced_multiple") or result.group("produced_single") or 1
         if not forgetting
         else 0
     )

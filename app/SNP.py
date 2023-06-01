@@ -1,5 +1,5 @@
-from models import SNPSystem
-from utils import check_rule_validity, parse_rule
+from app.models import SNPSystem
+from app.utils import check_rule_validity, parse_rule
 import numpy as np
 import random
 from typing import Dict, Union
@@ -8,7 +8,7 @@ import re
 
 class MatrixSNPSystem:
     def __init__(self, system: SNPSystem):
-        self.neurons = system.nodes
+        self.neurons = system.neurons
         self.synapses = system.synapses
         self.expected = system.expected
 
@@ -26,6 +26,8 @@ class MatrixSNPSystem:
         self.contents = np.empty((0, self.neuron_count), dtype=object)
         self.states = np.zeros([1, self.neuron_count], dtype=object)
         self.halted = False
+
+        # TODO: Create a neuron-wise delay status vector
 
         # self.print_system()
         # print("++")
