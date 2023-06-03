@@ -2,11 +2,23 @@ from pydantic import BaseModel, Field
 from typing import Literal, List, Union, Optional
 
 
-class Node(BaseModel):
+class Input(BaseModel):
     id: str
-    type: Literal["input", "output", "regular"]
-    content: Union[int, str]
-    rules: Optional[List[str]]
+    type: Literal["input"]
+    content: str
+
+
+class Output(BaseModel):
+    id: str
+    type: Literal["output"]
+    content: str
+
+
+class Regular(BaseModel):
+    id: str
+    type: Literal["regular"]
+    content: int
+    rules: List[str]
 
 
 class Synapse(BaseModel):
@@ -16,6 +28,6 @@ class Synapse(BaseModel):
 
 
 class SNPSystem(BaseModel):
-    neurons: List[Node]
+    neurons: List[Union[Input, Output, Regular]]
     synapses: List[Synapse]
     expected: Optional[List[object]]

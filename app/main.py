@@ -18,9 +18,9 @@ app.add_middleware(  # type: ignore
 )
 
 status = {
-    "1": "spiking",
-    "0": "default",
-    "-1": "closed",
+    1: "spiking",
+    0: "default",
+    -1: "closed",
 }
 
 resume_event = asyncio.Event()
@@ -99,30 +99,33 @@ async def check(system: SNPSystem):
 async def prev(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
     matrixSNP.compute_prev_configuration()
 
-    configs = {}
-    states = {}
-    for key, state, content in zip(
-        matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
-    ):
-        configs[key] = {
-            "content": content,
-            "delay": 0,
-        }
-        states[key] = status[str(state)]
+    configs = []
 
-    await websocket.send_json(
-        {
-            "states": states,
-            "configurations": configs,
-            "halted": bool(matrixSNP.halted),
-        }
-    )
+    for index, key in enumerate(matrixSNP.neuron_keys):
+        configs.append(
+            {
+                "id": key,
+                "content": matrixSNP.content[index],
+                "delay": int(matrixSNP.delay[index]),
+                "state": status[matrixSNP.state[index]],
+            }
+        )
+
+    try:
+        await websocket.send_json(
+            {
+                "type": "step",
+                "configurations": configs,
+                "halted": bool(matrixSNP.halted),
+            }
+        )
+    except Exception as e:
+        print(e)
 
 
 async def continue_simulate_guided(
     websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int
 ):
-    print(speed)
     while True:
         await next_guided(websocket, matrixSNP)
         if matrixSNP.halted:
@@ -142,25 +145,28 @@ async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
         matrixSNP.decision_vct = matrixSNP.spikeable_mx[0]
     matrixSNP.compute_next_configuration()
 
-    configs = {}
-    states = {}
-    for key, state, content in zip(
-        matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
-    ):
-        configs[key] = {
-            "content": content,
-            "delay": 0,
-        }
-        states[key] = status[str(state)]
+    configs = []
 
-    await websocket.send_json(
-        {
-            "type": "step",
-            "states": states,
-            "configurations": configs,
-            "halted": bool(matrixSNP.halted),
-        }
-    )
+    for index, key in enumerate(matrixSNP.neuron_keys):
+        configs.append(
+            {
+                "id": key,
+                "content": matrixSNP.content[index],
+                "delay": int(matrixSNP.delay[index]),
+                "state": status[matrixSNP.state[index]],
+            }
+        )
+
+    try:
+        await websocket.send_json(
+            {
+                "type": "step",
+                "configurations": configs,
+                "halted": bool(matrixSNP.halted),
+            }
+        )
+    except Exception as e:
+        print(e)
 
 
 @app.websocket("/ws/simulate/guided")
@@ -197,6 +203,13 @@ async def guided_mode(websocket: WebSocket):
             elif cmd == "prev":
                 simulating_task.cancel()
                 simulating_task = asyncio.create_task(prev(websocket, matrixSNP))
+            elif cmd == "history":
+                await websocket.send_json(
+                    {
+                        "type": "history",
+                        "history": matrixSNP.decisions,
+                    }
+                )
             elif cmd == "speed":
                 speed = data["speed"]
                 simulating_task.cancel()
@@ -205,14 +218,12 @@ async def guided_mode(websocket: WebSocket):
                 )
 
         except:
-            await websocket.close()
             break
 
 
 async def continue_simulate_pseudorandom(
     websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int
 ):
-    print(speed)
     while True:
         await next_pseudorandom(websocket, matrixSNP)
         if matrixSNP.halted:
@@ -223,24 +234,28 @@ async def continue_simulate_pseudorandom(
 async def next_pseudorandom(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
     matrixSNP.pseudorandom_simulate_next()
 
-    configs = {}
-    states = {}
-    for key, state, content in zip(
-        matrixSNP.neuron_keys, matrixSNP.state, matrixSNP.content
-    ):
-        configs[key] = {
-            "content": content,
-            "delay": 0,
-        }
-        states[key] = status[str(state)]
+    configs = []
 
-    await websocket.send_json(
-        {
-            "states": states,
-            "configurations": configs,
-            "halted": bool(matrixSNP.halted),
-        }
-    )
+    for index, key in enumerate(matrixSNP.neuron_keys):
+        configs.append(
+            {
+                "id": key,
+                "content": matrixSNP.content[index],
+                "delay": int(matrixSNP.delay[index]),
+                "state": status[matrixSNP.state[index]],
+            }
+        )
+
+    try:
+        await websocket.send_json(
+            {
+                "type": "step",
+                "configurations": configs,
+                "halted": bool(matrixSNP.halted),
+            }
+        )
+    except Exception as e:
+        print(e)
 
 
 @app.websocket("/ws/simulate/pseudorandom")
@@ -272,6 +287,13 @@ async def pseudorandom_mode(websocket: WebSocket):
                 simulating_task = asyncio.create_task(
                     next_pseudorandom(websocket, matrixSNP)
                 )
+            elif cmd == "history":
+                await websocket.send_json(
+                    {
+                        "type": "history",
+                        "history": matrixSNP.decisions.tolist(),
+                    }
+                )
             elif cmd == "prev":
                 simulating_task.cancel()
                 simulating_task = asyncio.create_task(prev(websocket, matrixSNP))
@@ -283,5 +305,4 @@ async def pseudorandom_mode(websocket: WebSocket):
                 )
 
         except:
-            await websocket.close()
             break

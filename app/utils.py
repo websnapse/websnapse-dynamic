@@ -7,7 +7,9 @@ def check_rule_validity(bound: str, spikes: int):
     if the number of spikes inside neuron
     satisfies the bound of the rule
     """
-    bound = re.sub("\\^(\\d)", "^{\\1}", bound).replace("^", "").replace("{\\ast}", "*")
+    bound = re.sub("\\^(\\d)", "^{\\1}", bound).replace("^", "")
+    bound = re.sub(r"\{\s*\\ast\s*\}", "*", bound)
+    bound = re.sub(r"\\ast", "*", bound)
     parsedBound = f"^{bound}$"
     validity = re.match(parsedBound, "a" * spikes)
     return validity is not None
