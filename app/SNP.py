@@ -157,8 +157,9 @@ class MatrixSNPSystem:
         for rule_idx in range(len(self.indicator_vct)):
             if self.indicator_vct[rule_idx] == 1:
                 neuron_idx = self.__get_mapped_neuron(rule_idx)
-                self.state[neuron_idx] = 1
-
+                self.state[neuron_idx] = (
+                    1 if self.rules[f"r{rule_idx}"]["type"] == "spiking" else 2
+                )
         for i in self.input_keys:
             if self.spike_train_vct[i] == "":
                 continue
@@ -375,6 +376,7 @@ class MatrixSNPSystem:
                         "bound": bound,
                         "consumption": consumption,
                         "production": production,
+                        "type": "spiking" if production > 0 else "forgetting",
                         "delay": delay,
                     }
                     self.neuron_rule_map[neuron_idx].append(self.rule_count)

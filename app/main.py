@@ -19,6 +19,7 @@ app.add_middleware(  # type: ignore
 
 status = {
     1: "spiking",
+    2: "forgetting",
     0: "default",
     -1: "closed",
 }

@@ -9,6 +9,8 @@ def check_rule_validity(bound: str, spikes: int):
     """
     bound = re.sub("\\^(\\d)", "^{\\1}", bound).replace("^", "")
     bound = re.sub(r"\{\s*\\ast\s*\}", "*", bound)
+    bound = re.sub(r"\{\s*\*\s*\}", "*", bound)
+    bound = re.sub(r"\{\s*\+\s*\}", "+", bound)
     bound = re.sub(r"\\ast", "*", bound)
     parsedBound = f"^{bound}$"
     validity = re.match(parsedBound, "a" * spikes)
