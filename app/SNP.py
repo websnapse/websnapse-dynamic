@@ -64,8 +64,8 @@ class MatrixSNPSystem:
             self.__check_halt_conditions()
             self.__update_delayed_indicator_vct()
             self.__update_neuron_status_vct()
-            self.__update_config_vct()
             self.__add_input_spiketrain()
+            self.__update_config_vct()
             self.__update_output_spiketrain()
             self.__update_neuron_states()
             self.__update_content()
@@ -135,12 +135,13 @@ class MatrixSNPSystem:
         self.contents = np.append(self.contents, [self.content], axis=0).astype(object)
 
     def __add_input_spiketrain(self):
-        for i in self.input_keys:
-            if self.spike_train_vct[i] == "":
-                continue
-            spike = str(self.spike_train_vct[i])[0]
-            spike = int(spike) if spike else 0
-            self.config_vct += self.adj_mx[i] * spike
+        self.spike_train = np.zeros(self.neuron_count, dtype=object)
+        non_empty = np.where(self.spike_train_vct != "")[0]
+        non_empty_inputs = np.intersect1d(non_empty, self.input_keys)
+
+        for i in non_empty_inputs:
+            spike = int(self.spike_train_vct[i][0] or 0)
+            self.spike_train += self.adj_mx[i] * spike
             self.spike_train_vct[i] = str(self.spike_train_vct[i])[1:]
 
     def __update_output_spiketrain(self):
@@ -170,7 +171,9 @@ class MatrixSNPSystem:
         self.states = np.append(self.states, [self.state], axis=0).astype(object)
 
     def __update_config_vct(self):
-        net_gain = np.dot(self.indicator_vct, self.trans_mx).astype(int)
+        net_gain = (
+            np.dot(self.indicator_vct, self.trans_mx).astype(int) + self.spike_train
+        )
         self.config_vct += np.multiply(self.neuron_status_vct, net_gain).astype(int)
 
     def __choose_decision_vct(self):
