@@ -272,9 +272,7 @@ async def pseudorandom_mode(websocket: WebSocket):
         speed = req["speed"]
         matrixSNP = MatrixSNPSystem(SNPSystem(**system))
         simulating = True
-        simulating_task = asyncio.create_task(
-            continue_simulate_pseudorandom(websocket, matrixSNP, speed)
-        )
+        simulating_task = asyncio.create_task(next_pseudorandom(websocket, matrixSNP))
         while True:
             try:
                 data = await websocket.receive_json()
@@ -308,7 +306,12 @@ async def pseudorandom_mode(websocket: WebSocket):
                     simulating_task = asyncio.create_task(
                         continue_simulate_pseudorandom(websocket, matrixSNP, speed)
                     )
-
+                elif cmd == "received":
+                    print(matrixSNP.iteration)
+                    simulating_task.cancel()
+                    simulating_task = asyncio.create_task(
+                        next_pseudorandom(websocket, matrixSNP)
+                    )
             except:
                 break
     except Exception as e:

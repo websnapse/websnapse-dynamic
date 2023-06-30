@@ -222,15 +222,14 @@ class MatrixSNPSystem:
         Updates the delay status vector by decrementing each value by 1
         """
 
-        for rule_idx in range(len(self.delayed_indicator_vct)):
-            if self.delayed_indicator_vct[rule_idx] == 1:
+        for rule_idx, delayed in enumerate(self.delayed_indicator_vct):
+            if delayed:
                 neuron_idx = self.__get_mapped_neuron(rule_idx)
-                delay = self.rule_delay_vct[rule_idx]
                 for rule in self.neuron_rule_map[neuron_idx]:
                     self.delay_status_vct[rule] -= 1
 
-        for rule_idx in range(self.rule_count):
-            if self.decision_vct[rule_idx] == 1:
+        for rule_idx, decision in enumerate(self.decision_vct):
+            if decision:
                 neuron_idx = self.__get_mapped_neuron(rule_idx)
                 delay = self.rule_delay_vct[rule_idx]
                 for rule in self.neuron_rule_map[neuron_idx]:
