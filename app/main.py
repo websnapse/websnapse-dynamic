@@ -135,7 +135,9 @@ async def continue_simulate_guided(
         await asyncio.sleep(1 / speed)
 
 
-async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
+async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int):
+    await asyncio.sleep(1 / speed)
+
     matrixSNP.compute_spikeable_mx()
     choices = matrixSNP.spikeable_mx.shape[0]
     if choices > 1:
@@ -176,52 +178,66 @@ async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
 async def guided_mode(websocket: WebSocket):
     await websocket.accept()
 
-    req = await websocket.receive_json()
-    data = req["data"]
-    speed = req["speed"]
-    matrixSNP = MatrixSNPSystem(SNPSystem(**req["data"]))
-    simulating = True
-    simulating_task = asyncio.create_task(
-        continue_simulate_guided(websocket, matrixSNP, speed)
-    )
-    while True:
-        try:
-            data = await websocket.receive_json()
-            cmd = data["cmd"]
+    try:
+        req = await websocket.receive_json()
+        system = req["data"]
+        speed = req["speed"]
+        matrixSNP = MatrixSNPSystem(SNPSystem(**system))
+        simulating = True
+        simulating_task = asyncio.create_task(next_guided(websocket, matrixSNP, speed))
+        while True:
+            try:
+                data = await websocket.receive_json()
+                cmd = data["cmd"]
 
-            if cmd == "stop" and simulating:
-                simulating_task.cancel()
-                simulating = False
-            elif cmd == "continue" and not simulating:
-                simulating_task = asyncio.create_task(
-                    continue_simulate_guided(websocket, matrixSNP, speed)
-                )
-            elif cmd == "next":
-                simulating_task.cancel()
-                simulating_task = asyncio.create_task(next_guided(websocket, matrixSNP))
-            elif cmd == "choice":
-                choice = data["choice"]
-                matrixSNP.create_spiking_vector(choice)
-                resume_event.set()
-            elif cmd == "prev":
-                simulating_task.cancel()
-                simulating_task = asyncio.create_task(prev(websocket, matrixSNP))
-            elif cmd == "history":
+                if cmd == "stop" and simulating:
+                    simulating_task.cancel()
+                    simulating = False
+                elif cmd == "continue" and not simulating:
+                    simulating_task = asyncio.create_task(
+                        next_guided(websocket, matrixSNP, speed)
+                    )
+                elif cmd == "next":
+                    simulating_task.cancel()
+                    simulating_task = asyncio.create_task(
+                        next_guided(websocket, matrixSNP, speed)
+                    )
+                elif cmd == "choice":
+                    choice = data["choice"]
+                    matrixSNP.create_spiking_vector(choice)
+                    resume_event.set()
+                elif cmd == "history":
+                    await websocket.send_json(
+                        {
+                            "type": "history",
+                            "history": matrixSNP.decisions.tolist(),
+                        }
+                    )
+                elif cmd == "prev":
+                    simulating_task.cancel()
+                    simulating_task = asyncio.create_task(prev(websocket, matrixSNP))
+
+                elif cmd == "speed":
+                    speed = data["speed"]
+                    simulating_task.cancel()
+                    if simulating:
+                        simulating_task = asyncio.create_task(
+                            next_guided(websocket, matrixSNP, speed)
+                        )
+                elif cmd == "received":
+                    simulating_task.cancel()
+                    simulating_task = asyncio.create_task(
+                        next_guided(websocket, matrixSNP, speed)
+                    )
+
+            except KeyError:
                 await websocket.send_json(
-                    {
-                        "type": "history",
-                        "history": matrixSNP.decisions,
-                    }
+                    {"type": "error", "message": "Command not recognized"}
                 )
-            elif cmd == "speed":
-                speed = data["speed"]
-                simulating_task.cancel()
-                simulating_task = asyncio.create_task(
-                    continue_simulate_guided(websocket, matrixSNP, speed)
-                )
-
-        except:
-            break
+            except:
+                break
+    except Exception as e:
+        pass
 
 
 async def continue_simulate_pseudorandom(
@@ -234,7 +250,10 @@ async def continue_simulate_pseudorandom(
         await asyncio.sleep(1 / speed)
 
 
-async def next_pseudorandom(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
+async def next_pseudorandom(
+    websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int
+):
+    await asyncio.sleep(1 / speed)
     matrixSNP.pseudorandom_simulate_next()
 
     configs = []
@@ -260,6 +279,9 @@ async def next_pseudorandom(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
         )
     except Exception as e:
         print(e)
+    finally:
+        if matrixSNP.halted:
+            return
 
 
 @app.websocket("/ws/simulate/pseudorandom")
@@ -272,7 +294,9 @@ async def pseudorandom_mode(websocket: WebSocket):
         speed = req["speed"]
         matrixSNP = MatrixSNPSystem(SNPSystem(**system))
         simulating = True
-        simulating_task = asyncio.create_task(next_pseudorandom(websocket, matrixSNP))
+        simulating_task = asyncio.create_task(
+            next_pseudorandom(websocket, matrixSNP, speed)
+        )
         while True:
             try:
                 data = await websocket.receive_json()
@@ -283,12 +307,12 @@ async def pseudorandom_mode(websocket: WebSocket):
                     simulating = False
                 elif cmd == "continue" and not simulating:
                     simulating_task = asyncio.create_task(
-                        continue_simulate_pseudorandom(websocket, matrixSNP, speed)
+                        next_pseudorandom(websocket, matrixSNP, speed)
                     )
                 elif cmd == "next":
                     simulating_task.cancel()
                     simulating_task = asyncio.create_task(
-                        next_pseudorandom(websocket, matrixSNP)
+                        next_pseudorandom(websocket, matrixSNP, speed)
                     )
                 elif cmd == "history":
                     await websocket.send_json(
@@ -303,16 +327,21 @@ async def pseudorandom_mode(websocket: WebSocket):
                 elif cmd == "speed":
                     speed = data["speed"]
                     simulating_task.cancel()
-                    simulating_task = asyncio.create_task(
-                        continue_simulate_pseudorandom(websocket, matrixSNP, speed)
-                    )
+                    if simulating:
+                        simulating_task = asyncio.create_task(
+                            next_pseudorandom(websocket, matrixSNP, speed)
+                        )
                 elif cmd == "received":
                     print(matrixSNP.iteration)
                     simulating_task.cancel()
                     simulating_task = asyncio.create_task(
-                        next_pseudorandom(websocket, matrixSNP)
+                        next_pseudorandom(websocket, matrixSNP, speed)
                     )
-            except:
+            except KeyError:
+                await websocket.send_json(
+                    {"type": "error", "message": "Command not recognized"}
+                )
+            except Exception as e:
                 break
     except Exception as e:
         pass
