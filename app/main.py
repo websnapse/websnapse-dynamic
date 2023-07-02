@@ -75,28 +75,6 @@ async def simulate_step(system: SNPSystem):
     }
 
 
-@app.post("/check")
-async def check(system: SNPSystem):
-    matrixSNP = MatrixSNPSystem(system)
-
-    matrixSNP.compute_spikeable_mx()
-    print(matrixSNP.spikeable_mx)
-
-    spikeable = matrixSNP.check_non_determinism()
-    print(spikeable)
-    choice = {
-        "n1": 0,
-        "n2": 1,
-        "n3": 0,
-    }
-    print(choice)
-    matrixSNP.create_spiking_vector(choice)
-    matrixSNP.compute_next_configuration()
-    print(matrixSNP.state)
-    print(matrixSNP.content)
-    print(matrixSNP.halted)
-
-
 async def prev(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
     matrixSNP.compute_prev_configuration()
 
@@ -123,16 +101,6 @@ async def prev(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
         )
     except Exception as e:
         print(e)
-
-
-async def continue_simulate_guided(
-    websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int
-):
-    while True:
-        await next_guided(websocket, matrixSNP)
-        if matrixSNP.halted:
-            break
-        await asyncio.sleep(1 / speed)
 
 
 async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int):
@@ -172,6 +140,9 @@ async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: i
         )
     except Exception as e:
         print(e)
+    finally:
+        if matrixSNP.halted:
+            return
 
 
 @app.websocket("/ws/simulate/guided")
@@ -238,16 +209,6 @@ async def guided_mode(websocket: WebSocket):
                 break
     except Exception as e:
         pass
-
-
-async def continue_simulate_pseudorandom(
-    websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int
-):
-    while True:
-        await next_pseudorandom(websocket, matrixSNP)
-        if matrixSNP.halted:
-            break
-        await asyncio.sleep(1 / speed)
 
 
 async def next_pseudorandom(
