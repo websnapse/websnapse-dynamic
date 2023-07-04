@@ -294,10 +294,9 @@ async def pseudorandom_mode(websocket: WebSocket):
                 elif cmd == "received":
                     simulating_task.cancel()
                     await asyncio.sleep(1 / speed)
-                    if matrixSNP.iteration != 100:
-                        simulating_task = asyncio.create_task(
-                            next_pseudorandom(websocket, matrixSNP, speed)
-                        )
+                    simulating_task = asyncio.create_task(
+                        next_pseudorandom(websocket, matrixSNP, speed)
+                    )
             except KeyError:
                 await websocket.send_json(
                     {"type": "error", "message": "Command not recognized"}
