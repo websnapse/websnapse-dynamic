@@ -1,4 +1,5 @@
 import asyncio
+import time
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from app.models import SNPSystem
 from fastapi.middleware.cors import CORSMiddleware
@@ -104,8 +105,6 @@ async def prev(websocket: WebSocket, matrixSNP: MatrixSNPSystem):
 
 
 async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int):
-    await asyncio.sleep(1 / speed)
-
     matrixSNP.compute_spikeable_mx()
     choices = matrixSNP.spikeable_mx.shape[0]
     if choices > 1:
@@ -197,6 +196,7 @@ async def guided_mode(websocket: WebSocket):
                         )
                 elif cmd == "received":
                     simulating_task.cancel()
+                    await asyncio.sleep(1 / speed)
                     simulating_task = asyncio.create_task(
                         next_guided(websocket, matrixSNP, speed)
                     )
@@ -214,7 +214,6 @@ async def guided_mode(websocket: WebSocket):
 async def next_pseudorandom(
     websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: int
 ):
-    await asyncio.sleep(1 / speed)
     matrixSNP.pseudorandom_simulate_next()
 
     configs = []
@@ -293,11 +292,12 @@ async def pseudorandom_mode(websocket: WebSocket):
                             next_pseudorandom(websocket, matrixSNP, speed)
                         )
                 elif cmd == "received":
-                    print(matrixSNP.iteration)
                     simulating_task.cancel()
-                    simulating_task = asyncio.create_task(
-                        next_pseudorandom(websocket, matrixSNP, speed)
-                    )
+                    await asyncio.sleep(1 / speed)
+                    if matrixSNP.iteration != 100:
+                        simulating_task = asyncio.create_task(
+                            next_pseudorandom(websocket, matrixSNP, speed)
+                        )
             except KeyError:
                 await websocket.send_json(
                     {"type": "error", "message": "Command not recognized"}
