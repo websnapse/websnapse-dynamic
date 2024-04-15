@@ -479,3 +479,21 @@ class MatrixSNPSystem:
             key for key, val in self.neuron_rule_map.items() if rule_idx in val
         )
         return neuron_idx
+
+# Neuron division
+
+    def __init_config_level_vct(self):
+        """
+        Initializes the config level vector to all zeros
+        with a length equal to the number of neurons
+        """
+        config_level_vct = np.zeros((self.neuron_count,))
+        return config_level_vct
+
+    def __init_mask_vct(self):
+        """
+        Initializes the mask vector to all zeros
+        with a length equal to the number of rules
+        """
+        mask_vct = np.zeros((self.rule_count,))
+        return mask_vct
