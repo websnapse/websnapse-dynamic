@@ -22,6 +22,8 @@ class MatrixSNPSystem:
         self.delay_status_vct = self.__init_delay_status_vct()
         self.neuron_status_vct = self.__init_neuron_status_vct()
         self.delayed_indicator_vct = self.__init_delayed_indicator_vct()
+        self.config_level_vct = self.__init_config_level_vct()
+        self.mask_vct = self.__init_mask_vct()
 
         self.contents = np.empty((0, self.neuron_count), dtype=object)
         self.states = np.empty((0, self.neuron_count), dtype=object)
