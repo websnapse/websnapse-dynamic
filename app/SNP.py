@@ -22,7 +22,7 @@ class MatrixSNPSystem:
         self.delay_status_vct = self.__init_delay_status_vct()
         self.neuron_status_vct = self.__init_neuron_status_vct()
         self.delayed_indicator_vct = self.__init_delayed_indicator_vct()
-        self.config_level_vct = self.__init_config_level_vct()
+        self.config_label_vct = self.__init_config_label_vct()
         self.mask_vct = self.__init_mask_vct()
 
         self.contents = np.empty((0, self.neuron_count), dtype=object)
@@ -484,13 +484,13 @@ class MatrixSNPSystem:
 
 # Neuron division
 
-    def __init_config_level_vct(self):
+    def __init_config_label_vct(self):
         """
-        Initializes the config level vector to all zeros
+        Initializes the config label vector to all zeros
         with a length equal to the number of neurons
         """
-        config_level_vct = np.zeros((self.neuron_count,))
-        return config_level_vct
+        config_label_vct = np.zeros((self.neuron_count,))
+        return config_label_vct
 
     def __init_mask_vct(self):
         """
