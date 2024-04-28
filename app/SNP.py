@@ -375,7 +375,7 @@ class MatrixSNPSystem:
             if n.type == "regular":
                 self.neuron_rule_map[neuron_idx] = []
                 for rule in n.rules:
-                    bound, consumption, production, delay = parse_rule(rule)
+                    new_neurons, bound, consumption, production, delay = parse_rule(rule)
                     self.rules[f"r{self.rule_count}"] = {
                         "bound": bound,
                         "consumption": consumption,
