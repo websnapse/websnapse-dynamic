@@ -24,7 +24,7 @@ def parse_rule(definition: str):
     Performs regex matching on the rule definition to get
     the consumption, production and delay values
     """
-    pattern = r"^((?P<bound>.*)\/)?(?P<consumption_bound>[a-z](\^((?P<consumed_single>[^\D])|({(?P<consumed_multiple>[2-9]|[1-9][0-9]+)})))?)\s*\\to\s*(?P<production>([a-z]((\^((?P<produced_single>[^0,1,\D])|({(?P<produced_multiple>[2-9]|[1-9][0-9]+]*)})))?\s*;\s*(?P<delay>[0-9]|[1-9][0-9]*))|(?P<forgot>0)|(?P<lambda>\\lambda)|(?P<division>\[\s*\]\_([A-Za-z]+)\s*\|\|\s*\[\s*\]\_([A-Za-z]+))))$"
+    pattern = r"^\[?\s*((?P<bound>.*)\/)?(?P<consumption_bound>[a-z](\^((?P<consumed_single>[^\D])|({(?P<consumed_multiple>[2-9]|[1-9][0-9]+)})))?)\s*\]?\s*\\to\s*(?P<production>([a-z]((\^((?P<produced_single>[^0,1,\D])|({(?P<produced_multiple>[2-9]|[1-9][0-9]+]*)})))?\s*;\s*(?P<delay>[0-9]|[1-9][0-9]*))|(?P<forgot>0)|(?P<lambda>\\lambda)|(?P<division>\[\s*\]\_\{(?P<new_neuron1>.+)\}\s*\|\|\s*\[\s*\]\_\{(?P<new_neuron2>.+)\})))$"
 
     result = re.match(pattern, definition)
 
@@ -48,4 +48,6 @@ def parse_rule(definition: str):
 
     bound = result.group("bound") or result.group("consumption_bound")
 
-    return bound, consumption, production, delay
+    new_neurons = (result.group("new_neuron1"), result.group("new_neuron2")) or ()
+
+    return new_neurons, bound, consumption, production, delay
