@@ -380,7 +380,7 @@ class MatrixSNPSystem:
                         "bound": bound,
                         "consumption": consumption,
                         "production": production,
-                        "type": "spiking" if production > 0 else "forgetting",
+                        "type": "division" if new_neurons != (None, None) else "spiking" if production > 0 else "forgetting",
                         "delay": delay,
                     }
                     self.neuron_rule_map[neuron_idx].append(self.rule_count)
