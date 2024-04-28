@@ -391,6 +391,7 @@ class MatrixSNPSystem:
                     "bound": ".+",
                     "consumption": 0,
                     "production": 0,
+                    "type": "input",
                     "delay": 0,
                 }
                 self.neuron_rule_map[neuron_idx].append(self.rule_count)
@@ -401,6 +402,7 @@ class MatrixSNPSystem:
                     "bound": ".+",
                     "consumption": 0,
                     "production": 0,
+                    "type": "output",
                     "delay": 0,
                 }
                 self.neuron_rule_map[neuron_idx].append(self.rule_count)
