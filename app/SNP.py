@@ -406,6 +406,7 @@ class MatrixSNPSystem:
                 for rule in n.rules:
                     new_neurons, bound, consumption, production, delay = parse_rule(rule)
                     self.rules[f"r{self.rule_count}"] = {
+                        "new_neurons": new_neurons,
                         "bound": bound,
                         "consumption": consumption,
                         "production": production,
@@ -417,6 +418,7 @@ class MatrixSNPSystem:
             elif n.type == "input":
                 self.neuron_rule_map[neuron_idx] = []
                 self.rules[f"r{self.rule_count}"] = {
+                    "new_neurons": (None, None),
                     "bound": ".+",
                     "consumption": 0,
                     "production": 0,
@@ -428,6 +430,7 @@ class MatrixSNPSystem:
             elif n.type == "output":
                 self.neuron_rule_map[neuron_idx] = []
                 self.rules[f"r{self.rule_count}"] = {
+                    "new_neurons": (None, None),
                     "bound": ".+",
                     "consumption": 0,
                     "production": 0,
