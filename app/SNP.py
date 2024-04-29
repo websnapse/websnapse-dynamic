@@ -34,6 +34,7 @@ class MatrixSNPSystem:
         self.halted = False
         self.iteration = 0
         self.cursor = 0
+        self.offset = 0
 
         # self.print_system()
         # print("++")
@@ -530,3 +531,9 @@ class MatrixSNPSystem:
         (i.e., the decision vector) and the mask vector
         """
         self.checker_vct = np.multiply(self.decision_vct, self.mask_vct).astype(int)
+
+    def __reset_offset(self):
+        """
+        Reset the value of the offset for each iteration
+        """
+        self.offset = 0
