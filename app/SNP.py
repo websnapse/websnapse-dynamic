@@ -1,4 +1,4 @@
-from app.models import SNPSystem
+from app.models import Regular, Synapse, SNPSystem
 from app.utils import check_rule_validity, parse_rule
 import numpy as np
 import random
@@ -90,6 +90,13 @@ class MatrixSNPSystem:
         self.cursor += 1
         if self.iteration == self.cursor - 1:
             self.iteration += 1
+            # Perform neuron division if there are any applicable
+            self.__update_config_label_vct()
+            self.__update_mask_vct()
+            self.__update_checker_vct()
+            self.__reset_offset()
+            self.__division_algorithm()
+            # Perform the rest of the simulation
             self.__update_delay_status_vct()
             self.__compute_indicator_vct()
             self.__check_halt_conditions()
@@ -567,3 +574,103 @@ class MatrixSNPSystem:
         Reset the value of the offset for each iteration
         """
         self.offset = 0
+
+    def __divide_neuron(self, neuron_id, i, j):
+        child1 = Regular(
+            id = self.rules[f"r{i}"]['new_neurons'][0],
+            type = "regular",
+            content = 0,
+            rules = ["a\\to 0"]
+        )
+        child2 = Regular(
+            id = self.rules[f"r{i}"]['new_neurons'][1],
+            type = "regular",
+            content = 0,
+            rules = ["a\\to 0"]
+        )
+        synapse_idx = 0
+        while synapse_idx < len(self.synapses):
+            synapse = self.synapses[synapse_idx]
+            if synapse.from_ == neuron_id: 
+                self.synapses.insert(synapse_idx, Synapse(
+                    from_ = child1.id,
+                    to = synapse.to,
+                    weight = float(1)
+                ))
+                self.synapses[synapse_idx+1] = Synapse(
+                    from_ = child2.id,
+                    to = synapse.to,
+                    weight = float(1)
+                )
+                synapse_idx -= 1
+            if synapse.to == neuron_id: 
+                self.synapses.insert(synapse_idx, Synapse(
+                    from_ = synapse.from_,
+                    to = child1.id,
+                    weight = float(1)
+                ))
+                self.synapses[synapse_idx+1] = Synapse(
+                    from_ = synapse.from_,
+                    to = child2.id,
+                    weight = float(1)
+                )
+                synapse_idx -= 1
+            synapse_idx += 1
+
+        for rule_idx in self.neuron_rule_map[j]:
+            del self.rules[f"r{rule_idx}"]
+            self.decision_vct[rule_idx] = 0
+            self.delay_status_vct[rule_idx] = 0
+            self.delayed_indicator_vct[rule_idx] = 0
+            self.mask_vct[rule_idx] = 0
+            self.checker_vct[rule_idx] = 0
+
+        self.neurons.insert(j, child1)
+        self.neurons[j+1] = child2
+
+        self.config_vct = np.r_[self.config_vct[:j], [0, 0], self.config_vct[j+1:]]
+        self.spike_train_vct = np.r_[self.spike_train_vct[:j], ['0', '0'], self.spike_train_vct[j+1:]]
+        self.neuron_status_vct = np.r_[self.neuron_status_vct[:j], [0, 0], self.neuron_status_vct[j+1:]]
+        self.config_label_vct = np.delete(self.config_label_vct, j)
+        self.config_label_vct = np.insert(self.config_label_vct, j, [child1.id, child2.id])
+
+        self.contents = np.insert(self.contents, j, 0, axis=1)
+        self.states = np.insert(self.states, j, 0, axis=1)
+        self.delays = np.insert(self.delays, j, 0, axis=1)
+        self.decisions = np.insert(self.decisions, j, 0, axis=1)
+        self.delay = np.insert(self.delay, j, 0)
+
+        old_rule_count = self.rule_count
+
+        self.__set_neuron_order()
+        self.__set_rule_order()
+
+        if self.rule_count > old_rule_count:
+            diff = self.rule_count - old_rule_count 
+            self.decision_vct = np.r_[self.decision_vct, np.zeros(diff)]
+            self.delay_status_vct = np.r_[self.delay_status_vct, np.zeros(diff)]
+            self.delayed_indicator_vct = np.r_[self.delayed_indicator_vct, np.zeros(diff)]
+            self.mask_vct = np.r_[self.mask_vct, np.zeros(diff)]
+            self.checker_vct = np.r_[self.checker_vct, np.zeros(diff)]
+        else:
+            self.decision_vct = self.decision_vct[:self.rule_count]
+            self.delay_status_vct = self.delay_status_vct[:self.rule_count]
+            self.delayed_indicator_vct = self.delayed_indicator_vct[:self.rule_count]
+            self.mask_vct = self.mask_vct[:self.rule_count]
+            self.checker_vct = self.checker_vct[:self.rule_count]
+
+        self.adj_mx = self.__init_adj_mx()
+        self.trans_mx = self.__init_trans_mx()
+
+    def __division_algorithm(self):
+        """
+        Perform division algorithm
+        """
+        rule_idx = 0
+        while rule_idx < len(self.checker_vct):
+            if self.checker_vct[rule_idx] == 1:
+                self.decision_vct[rule_idx] = 0
+                neuron_idx = self.__get_mapped_neuron(rule_idx)
+                neuron_id = self.neurons[neuron_idx].id
+                self.__divide_neuron(neuron_id, rule_idx, neuron_idx + self.offset)
+            rule_idx += 1
