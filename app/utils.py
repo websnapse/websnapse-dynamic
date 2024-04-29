@@ -48,6 +48,6 @@ def parse_rule(definition: str):
 
     bound = result.group("bound") or result.group("consumption_bound")
 
-    new_neurons = (result.group("new_neuron1"), result.group("new_neuron2")) or ()
+    new_neurons = (result.group("new_neuron1"), result.group("new_neuron2"))
 
     return new_neurons, bound, consumption, production, delay
