@@ -39,43 +39,47 @@ class MatrixSNPSystem:
         # self.print_system()
         # print("++")
 
-    def print_system(self):
-        print("Neuron Count:")
-        print(self.neuron_count)
-        print("Rule Count:")
-        print(self.rule_count)
-        print("Neurons:")
-        print(self.neurons)
-        print("Rules:")
-        print(self.rules)
-        print("Synapses:")
-        print(self.synapses)
-        print("Neuron Keys:")
-        print(self.neuron_keys)
-        print("Rule Keys:")
-        print(self.rule_keys)
-        print("Initial Configuration:")
-        print(self.config_vct)
-        print("Neuron Rule Map:")
-        print(self.neuron_rule_map)
-        print("Adjacency Matrix:")
-        print(self.adj_mx)
-        print("Spiking Transition Matrix:")
-        print(self.trans_mx)
-        print("Rule Delays:")
-        print(self.rule_delay_vct)
-        print("Config Label Vector:")
-        print(self.config_label_vct)
-        print("Mask Vector:")
-        print(self.mask_vct)
-        print("Spike Train Vector:")
-        print(self.spike_train_vct)
-        print("Spikeable Matrix")
-        print(self.spikeable_mx)
-        print("Decision Vector")
-        print(self.decision_vct)
-        print("Checker Vector:")
-        print(self.checker_vct)
+    def __repr__(self):
+        return (
+            f"ITERATION {self.iteration}\n"
+            f"\n"
+            f"Neuron Count:\n"
+            f"{self.neuron_count}\n"
+            f"Rule Count:\n"
+            f"{self.rule_count}\n"
+            f"Neurons:\n"
+            f"{self.neurons}\n"
+            f"Rules:\n"
+            f"{self.rules}\n"
+            f"Synapses:\n"
+            f"{self.synapses}\n"
+            f"Neuron Keys:\n"
+            f"{self.neuron_keys}\n"
+            f"Rule Keys:\n"
+            f"{self.rule_keys}\n"
+            f"Initial Configuration:\n"
+            f"{self.config_vct}\n"
+            f"Neuron Rule Map:\n"
+            f"{self.neuron_rule_map}\n"
+            f"Adjacency Matrix:\n"
+            f"{self.adj_mx}\n"
+            f"Spiking Transition Matrix:\n"
+            f"{self.trans_mx}\n"
+            f"Rule Delays:\n"
+            f"{self.rule_delay_vct}\n"
+            f"Config Label Vector:\n"
+            f"{self.config_label_vct}\n"
+            f"Mask Vector:\n"
+            f"{self.mask_vct}\n"
+            f"Spike Train Vector:\n"
+            f"{self.spike_train_vct}\n"
+            f"Spikeable Matrix:\n"
+            f"{self.spikeable_mx}\n"
+            f"Decision Vector:\n"
+            f"{self.decision_vct}\n"
+            f"Checker Vector:\n"
+            f"{self.checker_vct}\n"
+        )
 
     def pseudorandom_simulate_next(self):
         self.compute_spikeable_mx()
