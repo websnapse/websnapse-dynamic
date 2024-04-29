@@ -510,3 +510,23 @@ class MatrixSNPSystem:
         """
         checker_vct = np.zeros((self.rule_count,)).astype(int)
         return checker_vct
+
+    def __update_config_label_vct(self):
+        """
+        Updates the config label vector based on current iteration
+        """
+        self.config_label_vct = np.where(self.neuron_keys != None, self.neuron_keys, np.full((self.neuron_count,), -1)).astype(object)
+
+    def __update_mask_vct(self):
+        """
+        Updates the mask vector based on current iteration
+        """
+        division_bool = [rules["type"] == "division" for rules in self.rules.values()]
+        self.mask_vct = np.where(division_bool, np.full((self.rule_count,), 1), np.full((self.rule_count,), 0))
+
+    def __update_checker_vct(self):
+        """
+        Updates the checker vector by performing elementwise multiplication on the spiking vector
+        (i.e., the decision vector) and the mask vector
+        """
+        self.checker_vct = np.multiply(self.decision_vct, self.mask_vct).astype(int)
