@@ -26,7 +26,7 @@ class MatrixSNPSystem:
         self.mask_vct = self.__init_mask_vct()
         self.checker_vct = self.__init_checker_vct()
 
-        self.contents = np.empty((0, self.neuron_count), dtype=object)
+        self.contents = [['' for i in range(self.neuron_count)]]
         self.states = np.empty((0, self.neuron_count), dtype=object)
         self.delays = np.empty((0, self.neuron_count), dtype=int)
         self.decisions = np.empty((0, self.neuron_count), dtype=int)
@@ -166,11 +166,11 @@ class MatrixSNPSystem:
         )
 
     def __update_content(self):
-        self.content = self.config_vct.copy().astype(object)
-        self.content[self.input_keys] = self.spike_train_vct[self.input_keys]
-        self.content[self.output_keys] = self.spike_train_vct[self.output_keys]
+        self.content = self.config_vct.tolist()
+        for i in self.input_keys: self.content[i] = self.spike_train_vct[i]
+        for i in self.output_keys: self.content[i] = self.spike_train_vct[i]
 
-        self.contents = np.append(self.contents, [self.content], axis=0).astype(object)
+        self.contents.append(self.content)
 
     def __add_input_spiketrain(self):
         self.spike_train = np.zeros(self.neuron_count, dtype=object)
@@ -634,7 +634,6 @@ class MatrixSNPSystem:
         self.config_label_vct = np.delete(self.config_label_vct, j)
         self.config_label_vct = np.insert(self.config_label_vct, j, [child1.id, child2.id])
 
-        self.contents = np.insert(self.contents, j, 0, axis=1)
         self.states = np.insert(self.states, j, 0, axis=1)
         self.delays = np.insert(self.delays, j, 0, axis=1)
         self.decisions = np.insert(self.decisions, j, 0, axis=1)
