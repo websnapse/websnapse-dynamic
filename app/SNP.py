@@ -27,7 +27,7 @@ class MatrixSNPSystem:
         self.checker_vct = self.__init_checker_vct()
 
         self.contents = [['' for i in range(self.neuron_count)]]
-        self.states = np.empty((0, self.neuron_count), dtype=object)
+        self.states = [[0 for i in range(self.neuron_count)]]
         self.delays = np.empty((0, self.neuron_count), dtype=int)
         self.decisions = np.empty((0, self.neuron_count), dtype=int)
         self.delay = np.zeros(self.neuron_count, dtype=int)
@@ -191,7 +191,7 @@ class MatrixSNPSystem:
         self.config_vct[self.output_keys] = 0
 
     def __update_neuron_states(self):
-        self.state = np.where(self.neuron_status_vct == 0, -1, 0)
+        self.state = [-1 if i == 0 else 0 for i in self.neuron_status_vct]
 
         for rule_idx in range(len(self.indicator_vct)):
             if self.indicator_vct[rule_idx] == 1:
@@ -206,7 +206,7 @@ class MatrixSNPSystem:
             spike = int(spike) if spike else 0
             self.state[i] = spike
 
-        self.states = np.append(self.states, [self.state], axis=0).astype(object)
+        self.states.append(self.state)
 
     def __update_config_vct(self):
         net_gain = (
@@ -634,7 +634,6 @@ class MatrixSNPSystem:
         self.config_label_vct = np.delete(self.config_label_vct, j)
         self.config_label_vct = np.insert(self.config_label_vct, j, [child1.id, child2.id])
 
-        self.states = np.insert(self.states, j, 0, axis=1)
         self.delays = np.insert(self.delays, j, 0, axis=1)
         self.decisions = np.insert(self.decisions, j, 0, axis=1)
         self.delay = np.insert(self.delay, j, 0)
