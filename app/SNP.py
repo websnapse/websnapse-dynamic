@@ -29,7 +29,7 @@ class MatrixSNPSystem:
         self.contents = [['' for i in range(self.neuron_count)]]
         self.states = [[0 for i in range(self.neuron_count)]]
         self.delays = [[0 for i in range(self.neuron_count)]]
-        self.decisions = np.empty((0, self.neuron_count), dtype=int)
+        self.decisions = [[0 for i in range(self.neuron_count)]]
         self.delay = [0 for i in range(self.neuron_count)]
         self.halted = False
         self.iteration = 0
@@ -142,7 +142,7 @@ class MatrixSNPSystem:
         return True
 
     def __update_decisions(self):
-        decision = np.full(self.neuron_count, None, dtype=object)
+        decision = [None] * self.neuron_count
         for neuron in self.neuron_rule_map:
             if neuron in self.input_keys:
                 decision[neuron] = self.content[neuron]
@@ -156,7 +156,7 @@ class MatrixSNPSystem:
                     decision[neuron] = self.neuron_rule_map[neuron].index(rule)
                     break
 
-        self.decisions = np.append(self.decisions, [decision], axis=0).astype(object)
+        self.decisions.append(decision)
 
     def __check_halt_conditions(self):
         self.halted = (
@@ -634,7 +634,6 @@ class MatrixSNPSystem:
         self.config_label_vct = np.delete(self.config_label_vct, j)
         self.config_label_vct = np.insert(self.config_label_vct, j, [child1.id, child2.id])
 
-        self.decisions = np.insert(self.decisions, j, 0, axis=1)
         self.delay.insert(j, 0)
         self.delay[j+1] = 0
 
