@@ -28,9 +28,9 @@ class MatrixSNPSystem:
 
         self.contents = [['' for i in range(self.neuron_count)]]
         self.states = [[0 for i in range(self.neuron_count)]]
-        self.delays = np.empty((0, self.neuron_count), dtype=int)
+        self.delays = [[0 for i in range(self.neuron_count)]]
         self.decisions = np.empty((0, self.neuron_count), dtype=int)
-        self.delay = np.zeros(self.neuron_count, dtype=int)
+        self.delay = [0 for i in range(self.neuron_count)]
         self.halted = False
         self.iteration = 0
         self.cursor = 0
@@ -253,7 +253,7 @@ class MatrixSNPSystem:
             delay = self.delay_status_vct[rule_ref]
             self.delay[neuron_idx] = delay
             self.neuron_status_vct[neuron_idx] = delay == 0
-        self.delays = np.append(self.delays, [self.delay], axis=0).astype(object)
+        self.delays.append(self.delay)
 
     def __update_delay_status_vct(self):
         """
@@ -634,9 +634,9 @@ class MatrixSNPSystem:
         self.config_label_vct = np.delete(self.config_label_vct, j)
         self.config_label_vct = np.insert(self.config_label_vct, j, [child1.id, child2.id])
 
-        self.delays = np.insert(self.delays, j, 0, axis=1)
         self.decisions = np.insert(self.decisions, j, 0, axis=1)
-        self.delay = np.insert(self.delay, j, 0)
+        self.delay.insert(j, 0)
+        self.delay[j+1] = 0
 
         old_rule_count = self.rule_count
 
