@@ -43,7 +43,7 @@ async def simulate_all(system: SNPSystem):
 
     return {
         "states": matrixSNP.states.tolist(),
-        "configurations": matrixSNP.contents.tolist(),
+        "configurations": matrixSNP.contents,
         "keys": matrixSNP.neuron_keys,
     }
 
@@ -56,7 +56,7 @@ async def simulate_all(system: SNPSystem):
     print(matrixSNP.content)
 
     return {
-        "contents": matrixSNP.content.tolist(),
+        "contents": matrixSNP.content,
     }
 
 
