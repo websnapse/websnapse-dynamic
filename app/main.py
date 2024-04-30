@@ -180,7 +180,7 @@ async def guided_mode(websocket: WebSocket):
                     await websocket.send_json(
                         {
                             "type": "history",
-                            "history": matrixSNP.decisions.tolist(),
+                            "history": matrixSNP.decisions,
                         }
                     )
                 elif cmd == "prev":
@@ -278,7 +278,7 @@ async def pseudorandom_mode(websocket: WebSocket):
                     await websocket.send_json(
                         {
                             "type": "history",
-                            "history": matrixSNP.decisions.tolist(),
+                            "history": matrixSNP.decisions,
                         }
                     )
                 elif cmd == "prev":
