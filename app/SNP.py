@@ -1,5 +1,5 @@
 from app.models import Regular, Synapse, SNPSystem
-from app.utils import check_rule_validity, parse_rule
+from app.utils import rule_dict_lookup, check_rule_validity, parse_rule
 import numpy as np
 import random
 from typing import Dict, Union
@@ -11,6 +11,7 @@ class MatrixSNPSystem:
         self.neurons = system.neurons
         self.synapses = system.synapses
         self.expected = system.expected
+        self.rule_dict = system.rule_dict
 
         self.__set_neuron_order()
         self.__set_rule_order()
@@ -576,17 +577,31 @@ class MatrixSNPSystem:
         self.offset = 0
 
     def __divide_neuron(self, neuron_id, i, j):
+        child1_new_rules = []
+        child2_new_rules = []
+        new_rules = 0
+        child1_id = self.rules[f"r{i}"]['new_neurons'][0] 
+        child2_id = self.rules[f"r{i}"]['new_neurons'][1]
+        for rule in self.rule_dict:
+            if rule_dict_lookup(child1_id, rule)[0]:
+                child1_new_rules.append(rule_dict_lookup(child1_id, rule)[1])
+                new_rules += 1
+            elif rule_dict_lookup(child2_id, rule)[0]:
+                child2_new_rules.append(rule_dict_lookup(child2_id, rule)[1])
+                new_rules += 1
+        if len(child1_new_rules) == 0: child1_new_rules = ["a\\to \\lambda"]
+        if len(child2_new_rules) == 0: child2_new_rules = ["a\\to \\lambda"]
         child1 = Regular(
-            id = self.rules[f"r{i}"]['new_neurons'][0],
+            id = child1_id,
             type = "regular",
             content = 0,
-            rules = ["a\\to 0"]
+            rules = child1_new_rules
         )
         child2 = Regular(
-            id = self.rules[f"r{i}"]['new_neurons'][1],
+            id = child2_id,
             type = "regular",
             content = 0,
-            rules = ["a\\to 0"]
+            rules = child2_new_rules
         )
         synapse_idx = 0
         while synapse_idx < len(self.synapses):
