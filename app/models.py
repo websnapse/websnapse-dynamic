@@ -31,3 +31,4 @@ class SNPSystem(BaseModel):
     neurons: List[Union[Input, Output, Regular]]
     synapses: List[Synapse]
     expected: Optional[List[object]]
+    rule_dict: List[str]
