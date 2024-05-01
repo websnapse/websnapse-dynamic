@@ -631,7 +631,7 @@ class MatrixSNPSystem:
                 )
                 synapse_idx -= 1
             synapse_idx += 1
-
+        
         for rule_idx in self.neuron_rule_map[j]:
             del self.rules[f"r{rule_idx}"]
             self.decision_vct[rule_idx] = 0
@@ -658,18 +658,12 @@ class MatrixSNPSystem:
         self.__set_rule_order()
 
         if self.rule_count > old_rule_count:
-            diff = self.rule_count - old_rule_count 
-            self.decision_vct = np.r_[self.decision_vct, np.zeros(diff)]
-            self.delay_status_vct = np.r_[self.delay_status_vct, np.zeros(diff)]
-            self.delayed_indicator_vct = np.r_[self.delayed_indicator_vct, np.zeros(diff)]
-            self.mask_vct = np.r_[self.mask_vct, np.zeros(diff)]
-            self.checker_vct = np.r_[self.checker_vct, np.zeros(diff)]
-        else:
-            self.decision_vct = self.decision_vct[:self.rule_count]
-            self.delay_status_vct = self.delay_status_vct[:self.rule_count]
-            self.delayed_indicator_vct = self.delayed_indicator_vct[:self.rule_count]
-            self.mask_vct = self.mask_vct[:self.rule_count]
-            self.checker_vct = self.checker_vct[:self.rule_count]
+            diff = self.rule_count - old_rule_count + 1
+            self.decision_vct = np.r_[self.decision_vct[:j], np.zeros(diff), self.decision_vct[j+1:]]
+            self.delay_status_vct = np.r_[self.delay_status_vct[:j], np.zeros(diff), self.delay_status_vct[j+1:]]
+            self.delayed_indicator_vct = np.r_[self.delayed_indicator_vct[:j], np.zeros(diff), self.delayed_indicator_vct[j+1:]]
+            self.mask_vct = np.r_[self.mask_vct[:j], np.zeros(diff), self.mask_vct[j+1:]]
+            self.checker_vct = np.r_[self.checker_vct[:j], np.zeros(diff), self.checker_vct[j+1:]]
 
         self.adj_mx = self.__init_adj_mx()
         self.trans_mx = self.__init_trans_mx()
