@@ -51,3 +51,18 @@ def parse_rule(definition: str):
     new_neurons = (result.group("new_neuron1"), result.group("new_neuron2"))
 
     return new_neurons, bound, consumption, production, delay
+
+def rule_dict_lookup(neuron_id: str, definition: str):
+    """
+    Performs regex matching from the rule dictionary to get
+    the neuron ID and its rule in string form
+    """
+
+    pattern = r"^(?P<prefix>\\\bleft\b\[\s*(?P<rule>.+?)\s*\\\bright\b\])\_\{?(?P<neuron>.+?)\}?(?P<dynamic>\s*\\to\s*\\\bleft\b\[\s*\\\bright\b\]\_\{?.+?\}?\s*\\\bleft\b\|\\\bright\b\|\s*\\\bleft\b\[\s*\\\bright\b\]\_\{?.+?\}?)?$" 
+
+    result = re.match(pattern, definition)
+
+    if result.group("dynamic"):
+        return neuron_id == result.group("neuron"), result.group("prefix") + result.group("dynamic")
+
+    return neuron_id == result.group("neuron"), result.group("rule")
