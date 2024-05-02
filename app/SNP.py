@@ -586,7 +586,7 @@ class MatrixSNPSystem:
             if rule_dict_lookup(child1_id, rule)[0]:
                 child1_new_rules.append(rule_dict_lookup(child1_id, rule)[1])
                 new_rules += 1
-            elif rule_dict_lookup(child2_id, rule)[0]:
+            if rule_dict_lookup(child2_id, rule)[0]:
                 child2_new_rules.append(rule_dict_lookup(child2_id, rule)[1])
                 new_rules += 1
         if len(child1_new_rules) == 0: child1_new_rules = ["a\\to \\lambda"]
