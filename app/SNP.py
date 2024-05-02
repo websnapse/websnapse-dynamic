@@ -26,6 +26,7 @@ class MatrixSNPSystem:
         self.config_label_vct = self.__init_config_label_vct()
         self.mask_vct = self.__init_mask_vct()
         self.checker_vct = self.__init_checker_vct()
+        self.graphs = self.__init_graphs()
 
         self.contents = [['' for i in range(self.neuron_count)]]
         self.states = [[0 for i in range(self.neuron_count)]]
@@ -109,6 +110,7 @@ class MatrixSNPSystem:
             self.__update_neuron_states()
             self.__update_content()
             self.__update_decisions()
+            self.__update_graphs()
         else:
             self.content = self.contents[self.cursor - 1]
             self.delay = self.delays[self.cursor - 1]
@@ -575,6 +577,20 @@ class MatrixSNPSystem:
         Reset the value of the offset for each iteration
         """
         self.offset = 0
+
+    def __init_graphs(self):
+        adj_lst = {i:[] for i in range(self.neuron_count)} 
+        for i in range(self.neuron_count):
+            for j in range(self.neuron_count):
+                if self.adj_mx[i][j] != 0: adj_lst[i].append(j)
+        return [adj_lst]
+
+    def __update_graphs(self):
+        adj_lst = {i:[] for i in range(self.neuron_count)} 
+        for i in range(self.neuron_count):
+            for j in range(self.neuron_count):
+                if self.adj_mx[i][j] != 0: adj_lst[i].append(j)
+        self.graphs.append(adj_lst)
 
     def __divide_neuron(self, neuron_id, i, j):
         child1_new_rules = []
