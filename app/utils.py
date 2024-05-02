@@ -63,6 +63,6 @@ def rule_dict_lookup(neuron_id: str, definition: str):
     result = re.match(pattern, definition)
 
     if result.group("dynamic"):
-        return neuron_id == result.group("neuron"), result.group("prefix") + result.group("dynamic")
+        return neuron_id in result.group("neuron").split(","), result.group("prefix") + result.group("dynamic")
 
-    return neuron_id == result.group("neuron"), result.group("rule")
+    return neuron_id in result.group("neuron").split(","), result.group("rule")
