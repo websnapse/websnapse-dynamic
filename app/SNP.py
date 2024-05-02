@@ -668,6 +668,9 @@ class MatrixSNPSystem:
         self.adj_mx = self.__init_adj_mx()
         self.trans_mx = self.__init_trans_mx()
 
+        self.compute_spikeable_mx()
+        self.__choose_decision_vct()
+
     def __division_algorithm(self):
         """
         Perform division algorithm
