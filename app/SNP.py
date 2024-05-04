@@ -649,7 +649,6 @@ class MatrixSNPSystem:
             synapse_idx += 1
         
         for rule_idx in self.neuron_rule_map[j]:
-            del self.rules[f"r{rule_idx}"]
             self.decision_vct[rule_idx] = 0
             self.delay_status_vct[rule_idx] = 0
             self.delayed_indicator_vct[rule_idx] = 0
