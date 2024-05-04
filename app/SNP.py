@@ -660,7 +660,7 @@ class MatrixSNPSystem:
         self.neurons[j+1] = child2
 
         self.config_vct = np.r_[self.config_vct[:j], [0, 0], self.config_vct[j+1:]]
-        self.spike_train_vct = np.r_[self.spike_train_vct[:j], ['0', '0'], self.spike_train_vct[j+1:]]
+        self.spike_train_vct = np.r_[self.spike_train_vct[:j], ['', ''], self.spike_train_vct[j+1:]]
         self.neuron_status_vct = np.r_[self.neuron_status_vct[:j], [0, 0], self.neuron_status_vct[j+1:]]
         self.config_label_vct = np.delete(self.config_label_vct, j)
         self.config_label_vct = np.insert(self.config_label_vct, j, [child1.id, child2.id])
@@ -675,11 +675,11 @@ class MatrixSNPSystem:
 
         if self.rule_count > old_rule_count:
             diff = self.rule_count - old_rule_count + 1
-            self.decision_vct = np.r_[self.decision_vct[:j], np.zeros(diff), self.decision_vct[j+1:]]
-            self.delay_status_vct = np.r_[self.delay_status_vct[:j], np.zeros(diff), self.delay_status_vct[j+1:]]
-            self.delayed_indicator_vct = np.r_[self.delayed_indicator_vct[:j], np.zeros(diff), self.delayed_indicator_vct[j+1:]]
-            self.mask_vct = np.r_[self.mask_vct[:j], np.zeros(diff), self.mask_vct[j+1:]]
-            self.checker_vct = np.r_[self.checker_vct[:j], np.zeros(diff), self.checker_vct[j+1:]]
+            self.decision_vct = np.r_[self.decision_vct[:i], np.zeros(diff), self.decision_vct[i+1:]]
+            self.delay_status_vct = np.r_[self.delay_status_vct[:i], np.zeros(diff), self.delay_status_vct[i+1:]]
+            self.delayed_indicator_vct = np.r_[self.delayed_indicator_vct[:i], np.zeros(diff), self.delayed_indicator_vct[i+1:]]
+            self.mask_vct = np.r_[self.mask_vct[:i], np.zeros(diff), self.mask_vct[i+1:]]
+            self.checker_vct = np.r_[self.checker_vct[:i], np.zeros(diff), self.checker_vct[i+1:]]
 
         self.adj_mx = self.__init_adj_mx()
         self.trans_mx = self.__init_trans_mx()
