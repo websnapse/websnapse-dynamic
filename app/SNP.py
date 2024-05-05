@@ -459,9 +459,10 @@ class MatrixSNPSystem:
         adj_mx = np.zeros((self.neuron_count, self.neuron_count)).astype(int)
 
         for synapse in self.synapses:
-            source = self.neuron_keys.index(synapse.from_)
-            target = self.neuron_keys.index(synapse.to)
-            adj_mx[source, target] = synapse.weight
+            if synapse.from_ in self.neuron_keys and synapse.to in self.neuron_keys:
+                source = self.neuron_keys.index(synapse.from_)
+                target = self.neuron_keys.index(synapse.to)
+                adj_mx[source, target] = synapse.weight
         return adj_mx
 
     def check_non_determinism(self):
