@@ -13,6 +13,7 @@ class MatrixSNPSystem:
         self.expected = system.expected
         self.rule_dict = system.rule_dict
 
+        self.__rule_dict_parse()
         self.__set_neuron_order()
         self.__set_rule_order()
 
@@ -87,6 +88,7 @@ class MatrixSNPSystem:
         self.compute_spikeable_mx()
         self.__choose_decision_vct()
         self.compute_next_configuration()
+        print(self)
 
     def compute_next_configuration(self):
         self.cursor += 1
@@ -252,10 +254,11 @@ class MatrixSNPSystem:
         self.neuron_status_vct = np.ones((self.neuron_count,)).astype(int)
 
         for neuron_idx in range(self.neuron_count):
-            rule_ref = self.neuron_rule_map[neuron_idx][0]
-            delay = self.delay_status_vct[rule_ref]
-            self.delay[neuron_idx] = delay
-            self.neuron_status_vct[neuron_idx] = delay == 0
+            if self.neuron_rule_map[neuron_idx] != []:
+                rule_ref = self.neuron_rule_map[neuron_idx][0]
+                delay = self.delay_status_vct[rule_ref]
+                self.delay[neuron_idx] = delay
+                self.neuron_status_vct[neuron_idx] = delay == 0
         self.delays.append(self.delay)
 
     def __update_delay_status_vct(self):
@@ -592,6 +595,16 @@ class MatrixSNPSystem:
             for j in range(self.neuron_count):
                 if self.adj_mx[i][j] != 0: adj_lst[i].append(j)
         self.graphs.append(adj_lst)
+    
+    def __rule_dict_parse(self):
+        for neuron in self.neurons:
+            if neuron.type == "regular":
+                rules = []
+                for rule in self.rule_dict:
+                    if rule_dict_lookup(neuron.id, rule)[0]:
+                        rules.append(rule_dict_lookup(neuron.id, rule)[1])
+                if len(rules) == 0: rules = ["a\\to \\lambda"]
+                neuron.rules = rules
 
     def __divide_neuron(self, neuron_id, i, j):
         child1_new_rules = []
