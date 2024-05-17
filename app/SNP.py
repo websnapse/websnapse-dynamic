@@ -117,6 +117,7 @@ class MatrixSNPSystem:
             self.content = self.contents[self.cursor - 1]
             self.delay = self.delays[self.cursor - 1]
             self.state = self.states[self.cursor - 1]
+            self.graph = self.graphs[self.cursor - 1]
 
     def compute_prev_configuration(self):
         if self.cursor == 1:
@@ -125,6 +126,7 @@ class MatrixSNPSystem:
         self.content = self.contents[self.cursor - 1]
         self.delay = self.delays[self.cursor - 1]
         self.state = self.states[self.cursor - 1]
+        self.graph = self.graphs[self.cursor - 1]
 
     def pseudorandom_simulate_all(self):
         iteration = 0
