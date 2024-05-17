@@ -599,12 +599,9 @@ class MatrixSNPSystem:
     def __rule_dict_parse(self):
         for neuron in self.neurons:
             if neuron.type == "regular":
-                rules = []
                 for rule in self.rule_dict:
                     if rule_dict_lookup(neuron.id, rule)[0]:
-                        rules.append(rule_dict_lookup(neuron.id, rule)[1])
-                if len(rules) == 0: rules = ["a\\to \\lambda"]
-                neuron.rules = rules
+                        neuron.rules.append(rule_dict_lookup(neuron.id, rule)[1])
 
     def __divide_neuron(self, neuron_id, i, j):
         child1_new_rules = []
