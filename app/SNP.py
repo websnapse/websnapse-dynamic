@@ -13,8 +13,8 @@ class MatrixSNPSystem:
         self.expected = system.expected
         self.rule_dict = system.rule_dict
 
-        self.__rule_dict_parse()
         self.__set_neuron_order()
+        self.__rule_dict_parse()
         self.__set_rule_order()
 
         self.config_vct = self.__init_config_vct()
