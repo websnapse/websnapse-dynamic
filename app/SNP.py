@@ -88,7 +88,6 @@ class MatrixSNPSystem:
         self.compute_spikeable_mx()
         self.__choose_decision_vct()
         self.compute_next_configuration()
-        print(self)
 
     def compute_next_configuration(self):
         self.cursor += 1
