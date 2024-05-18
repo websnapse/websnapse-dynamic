@@ -584,17 +584,17 @@ class MatrixSNPSystem:
         self.offset = 0
 
     def __init_graphs(self):
-        adj_lst = {i:[] for i in range(self.neuron_count)} 
+        adj_lst = {self.neuron_keys[i]:[] for i in range(self.neuron_count)} 
         for i in range(self.neuron_count):
             for j in range(self.neuron_count):
-                if self.adj_mx[i][j] != 0: adj_lst[i].append(j)
+                if self.adj_mx[i][j] != 0: adj_lst[self.neuron_keys[i]].append(self.neuron_keys[j])
         return [adj_lst]
 
     def __update_graphs(self):
-        adj_lst = {i:[] for i in range(self.neuron_count)} 
+        adj_lst = {self.neuron_keys[i]:[] for i in range(self.neuron_count)} 
         for i in range(self.neuron_count):
             for j in range(self.neuron_count):
-                if self.adj_mx[i][j] != 0: adj_lst[i].append(j)
+                if self.adj_mx[i][j] != 0: adj_lst[self.neuron_keys[i]].append(self.neuron_keys[j])
         self.graphs.append(adj_lst)
     
     def __rule_dict_parse(self):
