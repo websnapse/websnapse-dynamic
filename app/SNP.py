@@ -169,7 +169,7 @@ class MatrixSNPSystem:
             np.all(self.indicator_vct == 0)
             and np.all(self.delay_status_vct == 0)
             and np.all(self.spike_train_vct[self.input_keys] == "")
-        )
+        ) or self.iteration == 100
 
     def __update_content(self):
         self.content = self.config_vct.tolist()
