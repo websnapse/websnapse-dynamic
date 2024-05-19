@@ -135,6 +135,7 @@ async def next_guided(websocket: WebSocket, matrixSNP: MatrixSNPSystem, speed: i
                 "configurations": configs,
                 "halted": bool(matrixSNP.halted),
                 "tick": int(matrixSNP.cursor),
+                "edges": matrixSNP.graphs[-1],
             }
         )
     except Exception as e:
@@ -235,6 +236,7 @@ async def next_pseudorandom(
                 "configurations": configs,
                 "halted": bool(matrixSNP.halted),
                 "tick": int(matrixSNP.cursor),
+                "edges": matrixSNP.graphs[-1],
             }
         )
     except Exception as e:
