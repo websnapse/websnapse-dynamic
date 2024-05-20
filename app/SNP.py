@@ -600,6 +600,7 @@ class MatrixSNPSystem:
     def __rule_dict_parse(self):
         for neuron in self.neurons:
             if neuron.type == "regular":
+                neuron.rules = []
                 for rule in self.rule_dict:
                     if rule_dict_lookup(neuron.id, rule)[0]:
                         neuron.rules.append(rule_dict_lookup(neuron.id, rule)[1])
