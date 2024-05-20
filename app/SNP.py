@@ -692,6 +692,13 @@ class MatrixSNPSystem:
             self.delayed_indicator_vct = np.r_[self.delayed_indicator_vct[:i], np.zeros(diff), self.delayed_indicator_vct[i+1:]]
             self.mask_vct = np.r_[self.mask_vct[:i], np.zeros(diff), self.mask_vct[i+1:]]
             self.checker_vct = np.r_[self.checker_vct[:i], np.zeros(diff), self.checker_vct[i+1:]]
+        else:
+            diff = old_rule_count - self.rule_count + 1
+            self.decision_vct = np.r_[self.decision_vct[:i], np.zeros(1), self.decision_vct[i+diff:]]
+            self.delay_status_vct = np.r_[self.delay_status_vct[:i], np.zeros(1), self.delay_status_vct[i+diff:]]
+            self.delayed_indicator_vct = np.r_[self.delayed_indicator_vct[:i], np.zeros(1), self.delayed_indicator_vct[i+diff:]]
+            self.mask_vct = np.r_[self.mask_vct[:i], np.zeros(1), self.mask_vct[i+diff:]]
+            self.checker_vct = np.r_[self.checker_vct[:i], np.zeros(1), self.checker_vct[i+diff:]]
 
         self.adj_mx = self.__init_adj_mx()
         self.trans_mx = self.__init_trans_mx()
