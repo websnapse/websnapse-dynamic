@@ -41,7 +41,9 @@ def parse_rule(definition: str):
         if not forgetting
         else 0
     )
-    delay = int(result.group("delay") or 1 if not forgetting else 0)
+
+    delay = 0
+    if result.group("delay") != None: delay = int(result.group("delay") or 1 if not forgetting else 0)
 
     consumption = -int(consumption)
     production = int(production)
