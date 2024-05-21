@@ -32,7 +32,7 @@ class MatrixSNPSystem:
         self.contents = [['' for i in range(self.neuron_count)]]
         self.states = [[0 for i in range(self.neuron_count)]]
         self.delays = [[0 for i in range(self.neuron_count)]]
-        self.decisions = [[0 for i in range(self.neuron_count)]]
+        self.decisions = [[None for i in range(self.neuron_count)]]
         self.delay = [0 for i in range(self.neuron_count)]
         self.halted = False
         self.iteration = 0
