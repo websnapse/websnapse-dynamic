@@ -9,6 +9,7 @@ def check_rule_validity(bound: str, spikes: int):
     """
     if not spikes:
         return False
+    bound = bound.replace("\\left", "").replace("\\right", "")
     bound = re.sub("\\^(\\d)", "^{\\1}", bound).replace("^", "")
     bound = re.sub(r"\{\s*\\ast\s*\}", "*", bound)
     bound = re.sub(r"\{\s*\*\s*\}", "*", bound)
