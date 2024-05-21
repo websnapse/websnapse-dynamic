@@ -182,6 +182,7 @@ async def guided_mode(websocket: WebSocket):
                         {
                             "type": "history",
                             "history": matrixSNP.decisions,
+                            "labels": matrixSNP.neuron_labels,
                         }
                     )
                 elif cmd == "prev":
@@ -281,6 +282,7 @@ async def pseudorandom_mode(websocket: WebSocket):
                         {
                             "type": "history",
                             "history": matrixSNP.decisions,
+                            "labels": matrixSNP.neuron_labels,
                         }
                     )
                 elif cmd == "prev":

@@ -29,6 +29,7 @@ class MatrixSNPSystem:
         self.checker_vct = self.__init_checker_vct()
         self.graphs = self.__init_graphs()
 
+        self.neuron_labels = [self.neuron_keys] 
         self.contents = [['' for i in range(self.neuron_count)]]
         self.states = [[0 for i in range(self.neuron_count)]]
         self.delays = [[0 for i in range(self.neuron_count)]]
@@ -111,6 +112,7 @@ class MatrixSNPSystem:
             self.__update_neuron_states()
             self.__update_content()
             self.__update_decisions()
+            self.__update_neuron_labels()
             self.__update_graphs()
         else:
             self.content = self.contents[self.cursor - 1]
@@ -589,6 +591,9 @@ class MatrixSNPSystem:
             for j in range(self.neuron_count):
                 if self.adj_mx[i][j] != 0: adj_lst[self.neuron_keys[i]].append(self.neuron_keys[j])
         return [adj_lst]
+    
+    def __update_neuron_labels(self):
+        self.neuron_labels.append(self.neuron_keys)
 
     def __update_graphs(self):
         adj_lst = {self.neuron_keys[i]:[] for i in range(self.neuron_count)} 
