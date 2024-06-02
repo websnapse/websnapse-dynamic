@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "regular",
+      "content": 2,
+      "rules": ["a^2/a \\to a;1", "a \\to 0"]
+    },
+    {
+      "id": "n2",
+      "type": "regular",
+      "content": 1,
+      "rules": ["a \\to a;1", "a \\to a;2"]
+    },
+    {
+      "id": "n3",
+      "type": "regular",
+      "content": 3,
+      "rules": ["a^3 \\to a;0", "a \\to a;2", "a^2 \\to 0"]
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "content": ""
+    }
+  ],
+  "synapses": [
+    {
+      "from": "n1",
+      "to": "n2",
+      "weight": 1
+    },
+    {
+      "from": "n1",
+      "to": "n3",
+      "weight": 1
+    },
+    {
+      "from": "n2",
+      "to": "n1",
+      "weight": 1
+    },
+    {
+      "from": "n2",
+      "to": "n3",
+      "weight": 1
+    },
+    {
+      "from": "n3",
+      "to": "out",
+      "weight": 1
+    }
+  ]
+}

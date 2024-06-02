@@ -1,0 +1,22 @@
+{
+  "expected": ["", "100100010"],
+  "nodes": [
+    {
+      "id": "in",
+      "type": "input",
+      "spiketrain": "10001001"
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "spiketrain": ""
+    }
+  ],
+  "edges": [
+    {
+      "source": "in",
+      "target": "out",
+      "label": 1
+    }
+  ]
+}

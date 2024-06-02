@@ -1,0 +1,16 @@
+{
+  "exclude": [ "env" ],
+  "venvPath": ".",
+  "venv": "venv",
+  "root": "./",
+  "python.analysis.extraPaths": [
+    "./venv/lib/site-packages"
+  ],
+
+  "executionEnvironments": [
+    {
+      "root": "./",
+      "venv": "venv",
+    }
+  ]
+}
