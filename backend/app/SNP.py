@@ -1,5 +1,5 @@
-from app.models import Regular, Synapse, SNPSystem
-from app.utils import rule_dict_lookup, check_rule_validity, parse_rule
+from models import Regular, Synapse, SNPSystem
+from utils import rule_dict_lookup, check_rule_validity, parse_rule
 import numpy as np
 import random
 from typing import Dict, Union

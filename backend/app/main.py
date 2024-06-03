@@ -1,9 +1,9 @@
 import asyncio
 import time
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from app.models import SNPSystem
+from models import SNPSystem
 from fastapi.middleware.cors import CORSMiddleware
-from app.SNP import MatrixSNPSystem
+from SNP import MatrixSNPSystem
 
 app = FastAPI()
 origins = [
