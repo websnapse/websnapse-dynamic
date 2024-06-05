@@ -3,7 +3,6 @@ import system from "@/stores/system";
 import { rule } from "postcss";
 
 export const importSystem = (system) => {
-  console.log("import");
   rulebook.all_rules = {};
   rulebook.global_rules = {};
   rulebook.global_edges = [];
@@ -54,8 +53,6 @@ export const importSystem = (system) => {
       edges: graph_edges,
     };
 
-    console.log(graph_system);
-
     return graph_system;
   }
   var graph_nodes = neurons.map((node) => {
@@ -70,8 +67,6 @@ export const importSystem = (system) => {
       y: position.y,
     };
   });
-
-  console.log(graph_nodes);
 
   var graph_edges = [];
   synapses.forEach((synapse) => {
@@ -182,8 +177,6 @@ export const importSystem = (system) => {
 };
 
 export const exportSystem = (graph) => {
-  console.log("export");
-
   const nodes = graph.save().nodes;
   const edges = graph.save().edges;
 

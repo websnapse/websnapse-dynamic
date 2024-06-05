@@ -24,30 +24,9 @@ export default async function addRule() {
           },
           false
         );
-        // graph.addItem("node", {
-        //   x: x,
-        //   y: y,
-        //   id: id,
-        //   type: type,
-        //   content: content,
-        //   rules: rules,
-        // });
         rulebook.all_rules[node.getModel().id] = newRules;
       }
     } else {
-      // graph.value.addItem("node", {
-      //   x: 100,
-      //   y: 100,
-      //   id: rulebook.current_neuron_id,
-      //   type: "regular",
-      //   content: 0,
-      //   rules: rulebook.rules,
-      // });
-
-      // graph.value.hideItem(rulebook.current_neuron_id);
-
-      // const newSystem = exportSystem(graph.value);
-      // console.log(newSystem);
       if (rulebook.current_neuron_id in rulebook.global_rules) {
         rulebook.global_rules[rulebook.current_neuron_id] = [
           ...rulebook.global_rules[rulebook.current_neuron_id],
@@ -57,8 +36,6 @@ export default async function addRule() {
         rulebook.global_rules[rulebook.current_neuron_id] = rulebook.rules;
       }
     }
-
-    console.log(rulebook);
   }
   rulebook.success = false;
 }

@@ -66,6 +66,7 @@ const loadSample = (file) => {
   fetch(`/samples/${file}`)
     .then((res) => res.json())
     .then((data) => {
+      cons;
       emit("load", data);
     });
 };

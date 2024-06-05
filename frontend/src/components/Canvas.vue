@@ -179,7 +179,6 @@ onMounted(() => {
           case "step":
             config.value = JSON.parse(JSON.stringify(data.configurations));
             config.edges = JSON.parse(JSON.stringify(data.edges));
-            // console.log(config.edges);
             data.configurations = null;
             if (data.halted && navbar.running) {
               $toast.success("Simulation completed successfully", {
@@ -199,12 +198,7 @@ onMounted(() => {
             break;
           case "history":
             let all_neurons = new Set();
-
-            console.log(data.history);
-            console.log(data.labels);
-
             data.labels.forEach((iter) => {
-              console.log(iter);
               iter.forEach((neuron) => {
                 all_neurons.add(neuron);
               });
