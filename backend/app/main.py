@@ -1,9 +1,10 @@
 import asyncio
 import time
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from models import SNPSystem
+from models import SNPSystem, Expression
 from fastapi.middleware.cors import CORSMiddleware
 from SNP import MatrixSNPSystem
+from SAT import SATSystem
 
 app = FastAPI()
 origins = [
@@ -246,6 +247,10 @@ async def next_pseudorandom(
         if matrixSNP.halted:
             return
 
+@app.post("/sat")
+async def generate_sat(exp: Expression):
+    sat = SATSystem(exp.exp)
+    return sat.system
 
 @app.websocket("/ws/simulate/pseudorandom")
 async def pseudorandom_mode(websocket: WebSocket):

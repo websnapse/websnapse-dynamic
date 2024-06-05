@@ -32,3 +32,6 @@ class SNPSystem(BaseModel):
     synapses: List[Synapse]
     expected: Optional[List[object]] = None
     rule_dict: Optional[List[str]] = []
+
+class Expression(BaseModel):
+    exp: str

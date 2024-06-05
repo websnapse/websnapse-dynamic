@@ -59,16 +59,43 @@ const samples = [
     name: "Subset Sum",
     file: "subset-sum/subset_sum([1,2,3],5).json",
   },
+  {
+    name: "SAT Solver",
+    file: undefined,
+  },
 ];
 
 const loadSample = (file) => {
-  // load file from public/samples
-  fetch(`/samples/${file}`)
-    .then((res) => res.json())
-    .then((data) => {
-      cons;
-      emit("load", data);
-    });
+  if (file) {
+    // load file from public/samples
+    fetch(`/samples/${file}`)
+      .then((res) => res.json())
+      .then((data) => {
+        emit("load", data);
+      });
+  } else {
+    // load SAT solver
+    var expression = prompt(
+      "Enter expression here (e.g., a or b and -a or -b):"
+    );
+    console.log(expression);
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ exp: expression }),
+    };
+    fetch(`${import.meta.env.VITE_HTTP_API}/sat`, requestOptions)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Object.keys(data).length) {
+          emit("load", data);
+        } else {
+          alert("Not a valid expression.");
+        }
+      });
+  }
 };
 
 const emit = defineEmits(["load", "clear"]);
