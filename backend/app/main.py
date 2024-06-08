@@ -10,6 +10,7 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:5173",
+    "https://websnapse-dynamic.netlify.app",
 ]
 app.add_middleware(  # type: ignore
     CORSMiddleware,
