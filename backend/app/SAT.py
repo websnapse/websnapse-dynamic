@@ -99,7 +99,7 @@ class SATSystem:
                 "0",
                 [
                     "a^2\\to\\lambda",
-                    "\\left[a\\right]\\to\\left[\\ \\right]_{t_1}\\ \\left|\\right|\\ \\left[\\ \\right]_{f_1}",
+                    "\\left[a\\right]\\to\\left[\\ \\right]_{t_1}\\ ||\\ \\left[\\ \\right]_{f_1}",
                 ],
             )
         )
@@ -138,7 +138,7 @@ class SATSystem:
                     "regular",
                     "2",
                     [
-                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{d_1}\\ \\left|\\right|\\ \\left[\\ \\right]_{d_2}"
+                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{d_1}\\ ||\\ \\left[\\ \\right]_{d_2}"
                     ],
                 )
             )
@@ -148,7 +148,7 @@ class SATSystem:
                     "regular",
                     "2",
                     [
-                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{Cx_1}\\ \\left|\\right|\\ \\left[\\ \\right]_{Cx_2}"
+                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{Cx_1}\\ ||\\ \\left[\\ \\right]_{Cx_2}"
                     ],
                 )
             )
@@ -158,7 +158,7 @@ class SATSystem:
                     "regular",
                     "2",
                     [
-                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{h_1}\\ \\left|\\right|\\ \\left[\\ \\right]_{h_2}"
+                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{h_1}\\ ||\\ \\left[\\ \\right]_{h_2}"
                     ],
                 )
             )
@@ -170,7 +170,7 @@ class SATSystem:
                     "regular",
                     "0",
                     [
-                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{d_1}\\ \\left|\\right|\\ \\left[\\ \\right]_{b_2}"
+                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{d_1}\\ ||\\ \\left[\\ \\right]_{b_2}"
                     ],
                 )
             )
@@ -180,7 +180,7 @@ class SATSystem:
                     "regular",
                     "0",
                     [
-                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{Cx_1}\\ \\left|\\right|\\ \\left[\\ \\right]_{e_2}"
+                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{Cx_1}\\ ||\\ \\left[\\ \\right]_{e_2}"
                     ],
                 )
             )
@@ -190,7 +190,7 @@ class SATSystem:
                     "regular",
                     "0",
                     [
-                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{h_1}\\ \\left|\\right|\\ \\left[\\ \\right]_{g_2}"
+                        "\\left[a^2\\right]\\to\\left[\\ \\right]_{h_1}\\ ||\\ \\left[\\ \\right]_{g_2}"
                     ],
                 )
             )
@@ -245,14 +245,14 @@ class SATSystem:
             self.rule_dict.append(
                 self.gen_rule(
                     f"b_{i}",
-                    f"\\left[a^2\\right]_{{b_{i}}}\\to\\left[\\ \\right]_{{d_{i}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{b_{i + 1}}}",
+                    f"\\left[a^2\\right]_{{b_{i}}}\\to\\left[\\ \\right]_{{d_{i}}}\\ ||\\ \\left[\\ \\right]_{{b_{i + 1}}}",
                     1,
                 )
             )
         self.rule_dict.append(
             self.gen_rule(
                 f"b_{n - 1}",
-                f"\\left[a^2\\right]_{{b_{n - 1}}}\\to\\left[\\ \\right]_{{d_{n - 1}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{d_{n}}}",
+                f"\\left[a^2\\right]_{{b_{n - 1}}}\\to\\left[\\ \\right]_{{d_{n - 1}}}\\ ||\\ \\left[\\ \\right]_{{d_{n}}}",
                 1,
             )
         )
@@ -261,14 +261,14 @@ class SATSystem:
             self.rule_dict.append(
                 self.gen_rule(
                     f"e_{i}",
-                    f"\\left[a^2\\right]_{{e_{i}}}\\to\\left[\\ \\right]_{{Cx_{i}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{e_{i + 1}}}",
+                    f"\\left[a^2\\right]_{{e_{i}}}\\to\\left[\\ \\right]_{{Cx_{i}}}\\ ||\\ \\left[\\ \\right]_{{e_{i + 1}}}",
                     1,
                 )
             )
         self.rule_dict.append(
             self.gen_rule(
                 f"e_{n - 1}",
-                f"\\left[a^2\\right]_{{e_{n - 1}}}\\to\\left[\\ \\right]_{{Cx_{n - 1}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{Cx_{n}}}",
+                f"\\left[a^2\\right]_{{e_{n - 1}}}\\to\\left[\\ \\right]_{{Cx_{n - 1}}}\\ ||\\ \\left[\\ \\right]_{{Cx_{n}}}",
                 1,
             )
         )
@@ -277,14 +277,14 @@ class SATSystem:
             self.rule_dict.append(
                 self.gen_rule(
                     f"g_{i}",
-                    f"\\left[a^2\\right]_{{g_{i}}}\\to\\left[\\ \\right]_{{h_{i}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{g_{i + 1}}}",
+                    f"\\left[a^2\\right]_{{g_{i}}}\\to\\left[\\ \\right]_{{h_{i}}}\\ ||\\ \\left[\\ \\right]_{{g_{i + 1}}}",
                     1,
                 )
             )
         self.rule_dict.append(
             self.gen_rule(
                 f"g_{n - 1}",
-                f"\\left[a^2\\right]_{{g_{n - 1}}}\\to\\left[\\ \\right]_{{h_{n - 1}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{h_{n}}}",
+                f"\\left[a^2\\right]_{{g_{n - 1}}}\\to\\left[\\ \\right]_{{h_{n - 1}}}\\ ||\\ \\left[\\ \\right]_{{h_{n}}}",
                 1,
             )
         )
@@ -293,7 +293,7 @@ class SATSystem:
             self.rule_dict.append(
                 self.gen_rule(
                     f"h_{i}",
-                    f"\\left[a^2\\right]_{{h_{i}}}\\to\\left[\\ \\right]_{{Cx_{i}1}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{Cx_{i}0}}",
+                    f"\\left[a^2\\right]_{{h_{i}}}\\to\\left[\\ \\right]_{{Cx_{i}1}}\\ ||\\ \\left[\\ \\right]_{{Cx_{i}0}}",
                     1,
                 )
             )
@@ -332,7 +332,7 @@ class SATSystem:
         self.rule_dict.append(
             self.gen_rule(
                 f"{0}",
-                "\\left[a\\right]_{0}\\to\\left[\\ \\right]_{t_1}\\ \\left|\\right|\\ \\left[\\ \\right]_{f_1}",
+                "\\left[a\\right]_{0}\\to\\left[\\ \\right]_{t_1}\\ ||\\ \\left[\\ \\right]_{f_1}",
                 1,
             )
         )
@@ -342,7 +342,7 @@ class SATSystem:
                 self.rule_dict.append(
                     self.gen_rule(
                         t_i,
-                        f"\\left[a\\right]_{{{t_i}}}\\to\\left[\\ \\right]_{{t_{i + 1}{t_i}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{f_{i + 1}{t_i}}}",
+                        f"\\left[a\\right]_{{{t_i}}}\\to\\left[\\ \\right]_{{t_{i + 1}{t_i}}}\\ ||\\ \\left[\\ \\right]_{{f_{i + 1}{t_i}}}",
                         1,
                     )
                 )
@@ -352,7 +352,7 @@ class SATSystem:
                 self.rule_dict.append(
                     self.gen_rule(
                         f_i,
-                        f"\\left[a\\right]_{{{f_i}}}\\to\\left[\\ \\right]_{{t_{i + 1}{f_i}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{f_{i + 1}{f_i}}}",
+                        f"\\left[a\\right]_{{{f_i}}}\\to\\left[\\ \\right]_{{t_{i + 1}{f_i}}}\\ ||\\ \\left[\\ \\right]_{{f_{i + 1}{f_i}}}",
                         1,
                     )
                 )
@@ -392,7 +392,7 @@ class SATSystem:
             self.rule_dict.append(
                 self.gen_rule(
                     t_n,
-                    f"\\left[a\\right]_{{{t_n}}}\\to\\left[\\ \\right]_{{t_{n + 1}{t_n}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{f_{n + 1}{t_n}}}",
+                    f"\\left[a\\right]_{{{t_n}}}\\to\\left[\\ \\right]_{{t_{n + 1}{t_n}}}\\ ||\\ \\left[\\ \\right]_{{f_{n + 1}{t_n}}}",
                     1,
                 )
             )
@@ -407,7 +407,7 @@ class SATSystem:
             self.rule_dict.append(
                 self.gen_rule(
                     f_n,
-                    f"\\left[a\\right]_{{{f_n}}}\\to\\left[\\ \\right]_{{t_{n + 1}{f_n}}}\\ \\left|\\right|\\ \\left[\\ \\right]_{{f_{n + 1}{f_n}}}",
+                    f"\\left[a\\right]_{{{f_n}}}\\to\\left[\\ \\right]_{{t_{n + 1}{f_n}}}\\ ||\\ \\left[\\ \\right]_{{f_{n + 1}{f_n}}}",
                     1,
                 )
             )

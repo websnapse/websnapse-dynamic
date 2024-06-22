@@ -40,6 +40,7 @@ const props = defineProps({
 const specialKeys = {
   '/': '\\slash',
   '*': '\\ast',
+  '|': '\\vert',
 };
 
 const mathField = ref(null);

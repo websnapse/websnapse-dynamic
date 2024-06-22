@@ -25,7 +25,7 @@ def parse_rule(definition: str):
     Performs regex matching on the rule definition to get
     the consumption, production and delay values
     """
-    pattern = r"^(\\\bleft\b\[)?\s*(\\\s)*\s*((?P<bound>.*)\/)?(?P<consumption_bound>[a-z](\^((?P<consumed_single>[^\D])|({(?P<consumed_multiple>[2-9]|[1-9][0-9]+)})))?)\s*(\\\s)*\s*(\\\bright\b\])?\s*(\\\s)*\s*\\to\s*(\\\s)*\s*(?P<production>([a-z]((\^((?P<produced_single>[^0,1,\D])|({(?P<produced_multiple>[2-9]|[1-9][0-9]+]*)})))?(\s*(\\\s)*\s*;\s*(\\\s)*\s*(?P<delay>[0-9]|[1-9][0-9]*))?)|(?P<forgot>0)|(?P<lambda>\\lambda)|(?P<division>\\\bleft\b\[\s*(\\\s)*\s*\\\bright\b\]\_\{?(?P<new_neuron1>.+?)\}?\s*(\\\s)*\s*\\\bleft\b\|\\\bright\b\|\s*(\\\s)*\s*\\\bleft\b\[\s*(\\\s)*\s*\\\bright\b\]\_\{?(?P<new_neuron2>.+?)\}?)))$"
+    pattern = r"^(\\\bleft\b\[)?\s*(\\\s)*\s*((?P<bound>.*)\/)?(?P<consumption_bound>[a-z](\^((?P<consumed_single>[^\D])|({(?P<consumed_multiple>[2-9]|[1-9][0-9]+)})))?)\s*(\\\s)*\s*(\\\bright\b\])?\s*(\\\s)*\s*\\to\s*(\\\s)*\s*(?P<production>([a-z]((\^((?P<produced_single>[^0,1,\D])|({(?P<produced_multiple>[2-9]|[1-9][0-9]+]*)})))?(\s*(\\\s)*\s*;\s*(\\\s)*\s*(?P<delay>[0-9]|[1-9][0-9]*))?)|(?P<forgot>0)|(?P<lambda>\\lambda)|(?P<division>\\\bleft\b\[\s*(\\\s)*\s*\\\bright\b\]\_\{?(?P<new_neuron1>.+?)\}?\s*(\\\s)*\s*\|\|\s*(\\\s)*\s*\\\bleft\b\[\s*(\\\s)*\s*\\\bright\b\]\_\{?(?P<new_neuron2>.+?)\}?)))$"
 
     result = re.match(pattern, definition)
 
@@ -61,7 +61,7 @@ def rule_dict_lookup(neuron_id: str, definition: str):
     the neuron ID and its rule in string form
     """
 
-    pattern = r"^(?P<prefix>\\\bleft\b\[\s*(\\\s)*\s*(?P<rule>.+?)\s*(\\\s)*\s*\\\bright\b\])\_\{?(?P<neuron>.+?)\}?(?P<dynamic>\s*(\\\s)*\s*\\to\s*(\\\s)*\s*\\\bleft\b\[\s*(\\\s)*\s*\\\bright\b\]\_\{?.+?\}?\s*(\\\s)*\s*\\\bleft\b\|\\\bright\b\|\s*(\\\s)*\s*\\\bleft\b\[\s*(\\\s)*\s*\\\bright\b\]\_\{?.+?\}?)?$" 
+    pattern = r"^(?P<prefix>\\\bleft\b\[\s*(\\\s)*\s*(?P<rule>.+?)\s*(\\\s)*\s*\\\bright\b\])\_\{?(?P<neuron>.+?)\}?(?P<dynamic>\s*(\\\s)*\s*\\to\s*(\\\s)*\s*\\\bleft\b\[\s*(\\\s)*\s*\\\bright\b\]\_\{?.+?\}?\s*(\\\s)*\s*\|\|\s*(\\\s)*\s*\\\bleft\b\[\s*(\\\s)*\s*\\\bright\b\]\_\{?.+?\}?)?$" 
 
     result = re.match(pattern, definition)
 
