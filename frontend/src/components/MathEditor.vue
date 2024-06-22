@@ -37,12 +37,6 @@ const props = defineProps({
   },
 });
 
-const specialKeys = {
-  '/': '\\slash',
-  '*': '\\ast',
-  '|': '\\vert',
-};
-
 const mathField = ref(null);
 
 onMounted(() => {
@@ -58,9 +52,28 @@ onMounted(() => {
     autoCommands: 'slash to rightarrow lambda ast',
   });
 
-  mathFieldInstance.el().addEventListener('keydown', function (e) {
+  const specialKeys = {
+    '/': () => {
+        mathFieldInstance.cmd('\\slash');
+        mathFieldInstance.keystroke('Right');
+    },
+    '*': () => {
+        mathFieldInstance.cmd('\\ast');
+        mathFieldInstance.keystroke('Right');
+    },
+    '+': () => {
+        mathFieldInstance.cmd('+');
+        mathFieldInstance.keystroke('Right');
+    },
+    '|': () => {
+        mathFieldInstance.cmd('\\vert');
+        mathFieldInstance.cmd('\\vert');
+    }
+  };
+
+  mathFieldInstance.el().addEventListener('keydown', (e) => {
     if (e.key in specialKeys) {
-      mathFieldInstance.cmd(specialKeys[e.key]);
+      specialKeys[e.key]();
       e.preventDefault();
     }
   });
